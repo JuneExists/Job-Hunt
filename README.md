@@ -8,7 +8,7 @@ Art for the profile pictures by **June Whitaker** · [@june.the.human](https://w
 
 | File | What it is |
 | --- | --- |
-| `index.html` | The whole app, including the built-in library of 4,406 jobs |
+| `index.html` | The whole app, including the built-in library of 4,464 jobs |
 | `presets/` | The 20 profile pictures |
 | `jobs-library.json` | The job library as a separate file, in case you want to edit it |
 | `Code.gs` | Optional Google script for one-tap emailing and reply alerts |
@@ -51,5 +51,7 @@ Each person who wants this sets up their own copy.
 ## Editing the job library
 
 `index.html` has the library built in (look for `id="libData"`). To change jobs, edit `jobs-library.json`, then paste its contents between the `<script type="application/json" id="libData">` and `</script>` tags in `index.html`. Each job can have a `states` list (like `["UT","ID"]`) to show it only to people in those states, and `location`, `lat` and `lon` so it shows a distance. The 4,114 local city, school, hospital, transit, university and state-government jobs were made with `gen_local.py`: edit its city lists and job templates and run it again to regenerate them.
+
+The 58 small-business jobs (coffee shops, bakeries, bookstores, studios, salons and more) show for everyone, with a "Find openings" search near their ZIP code.
 
 Pay ranges in the library are typical starting ranges and change over time. The app labels them "typical" and links to live openings.
