@@ -1,0 +1,401 @@
+# ST|Business|City|lat|lon|role
+# roles: books coffee bakery icecream records restaurant deli donut pizza boutique market candy bbq gifts tourist
+AL|Alabama Booksmith|Homewood|33.47|-86.80|books
+AL|Church Street Coffee & Books|Birmingham|33.52|-86.80|coffee
+AL|Big Spoon Creamery|Birmingham|33.52|-86.80|icecream
+AL|Charlemagne Record Exchange|Birmingham|33.52|-86.80|records
+AL|Dreamland Bar-B-Que|Tuscaloosa|33.21|-87.57|bbq
+AK|Title Wave Books|Anchorage|61.22|-149.90|books
+AK|Kaladi Brothers Coffee|Anchorage|61.22|-149.90|coffee
+AK|Snow City Cafe|Anchorage|61.22|-149.90|restaurant
+AK|Moose's Tooth Pub & Pizzeria|Anchorage|61.19|-149.87|pizza
+AK|Wild Scoops|Anchorage|61.22|-149.90|icecream
+AK|Hot Licks Homemade Ice Cream|Fairbanks|64.84|-147.72|icecream
+AZ|Changing Hands Bookstore|Tempe|33.43|-111.94|books
+AZ|Bookmans|Tucson|32.22|-110.97|books
+AZ|Antigone Books|Tucson|32.24|-110.96|books
+AZ|Pizzeria Bianco|Phoenix|33.45|-112.07|pizza
+AZ|Lux Central|Phoenix|33.48|-112.07|coffee
+AR|WordsWorth Books|Little Rock|34.75|-92.29|books
+AR|Loblolly Creamery|Little Rock|34.75|-92.29|icecream
+AR|Arsaga's Coffee|Fayetteville|36.06|-94.16|coffee
+AR|Big Orange|Little Rock|34.75|-92.29|restaurant
+CA|City Lights Booksellers|San Francisco|37.80|-122.41|books
+CA|The Last Bookstore|Los Angeles|34.05|-118.25|books
+CA|Skylight Books|Los Angeles|34.10|-118.29|books
+CA|Warwick's|La Jolla|32.84|-117.27|books
+CA|Bi-Rite Creamery|San Francisco|37.76|-122.43|icecream
+CA|Tartine Bakery|San Francisco|37.76|-122.42|bakery
+CA|Amoeba Music|Los Angeles|34.10|-118.33|records
+CA|Porto's Bakery & Cafe|Glendale|34.15|-118.26|bakery
+CA|Verve Coffee Roasters|Santa Cruz|36.97|-122.03|coffee
+CO|Boulder Book Store|Boulder|40.02|-105.28|books
+CO|Old Firehouse Books|Fort Collins|40.59|-105.08|books
+CO|Twist & Shout Records|Denver|39.72|-104.96|records
+CO|Little Man Ice Cream|Denver|39.76|-105.01|icecream
+CO|Denver Biscuit Company|Denver|39.74|-104.99|restaurant
+CO|Huckleberry Roasters|Denver|39.77|-104.98|coffee
+CT|R.J. Julia Booksellers|Madison|41.28|-72.60|books
+CT|Frank Pepe Pizzeria Napoletana|New Haven|41.30|-72.92|pizza
+CT|Sally's Apizza|New Haven|41.30|-72.92|pizza
+CT|Arethusa Farm Dairy|New Haven|41.31|-72.92|icecream
+CT|Willoughby's Coffee & Tea|New Haven|41.31|-72.93|coffee
+DE|Browseabout Books|Rehoboth Beach|38.72|-75.08|books
+DE|Grotto Pizza|Rehoboth Beach|38.72|-75.08|pizza
+DE|The Ice Cream Store|Rehoboth Beach|38.72|-75.08|icecream
+DE|Dogfish Head Brewings & Eats|Rehoboth Beach|38.72|-75.08|restaurant
+DC|Politics and Prose|Washington|38.95|-77.07|books
+DC|Kramers|Washington|38.91|-77.04|books
+DC|Busboys and Poets|Washington|38.92|-77.03|restaurant
+DC|Ben's Chili Bowl|Washington|38.92|-77.03|restaurant
+DC|Compass Coffee|Washington|38.91|-77.02|coffee
+DC|Baked & Wired|Washington|38.90|-77.06|bakery
+FL|Books & Books|Coral Gables|25.75|-80.26|books
+FL|Haslam's Book Store|St. Petersburg|27.77|-82.66|books
+FL|Inkwood Books|Tampa|27.95|-82.48|books
+FL|Azucar Ice Cream Company|Miami|25.77|-80.22|icecream
+FL|Panther Coffee|Miami|25.80|-80.20|coffee
+FL|Columbia Restaurant|Tampa|27.96|-82.44|restaurant
+GA|A Cappella Books|Atlanta|33.76|-84.35|books
+GA|Little Shop of Stories|Decatur|33.77|-84.30|books
+GA|E. Shaver, Bookseller|Savannah|32.07|-81.09|books
+GA|Leopold's Ice Cream|Savannah|32.08|-81.09|icecream
+GA|Highland Bakery|Atlanta|33.77|-84.35|bakery
+GA|Criminal Records|Atlanta|33.76|-84.35|records
+GA|The Varsity|Atlanta|33.77|-84.39|restaurant
+HI|Leonard's Bakery|Honolulu|21.28|-157.81|bakery
+HI|Matsumoto Shave Ice|Haleiwa|21.59|-158.10|icecream
+HI|Waiola Shave Ice|Honolulu|21.29|-157.82|icecream
+HI|Rainbow Drive-In|Honolulu|21.27|-157.81|restaurant
+HI|Honolulu Coffee|Honolulu|21.28|-157.83|coffee
+ID|Rediscovered Books|Boise|43.62|-116.20|books
+ID|Big City Coffee|Boise|43.62|-116.21|coffee
+ID|Westside Drive-In|Boise|43.62|-116.24|restaurant
+ID|Bittercreek Alehouse|Boise|43.62|-116.20|restaurant
+IL|Women & Children First|Chicago|41.98|-87.67|books
+IL|Myopic Books|Chicago|41.91|-87.68|books
+IL|Reckless Records|Chicago|41.94|-87.65|records
+IL|Margie's Candies|Chicago|41.92|-87.70|candy
+IL|Metropolis Coffee Company|Chicago|41.99|-87.66|coffee
+IL|Dark Matter Coffee|Chicago|41.90|-87.68|coffee
+IN|Square Donuts|Terre Haute|39.47|-87.41|donut
+IN|Hubbard & Cravens Coffee|Indianapolis|39.77|-86.16|coffee
+IN|Luna Music|Indianapolis|39.86|-86.14|records
+IN|Bookmamas|Indianapolis|39.83|-86.14|books
+IN|Shapiro's Delicatessen|Indianapolis|39.75|-86.16|deli
+IA|Prairie Lights Bookstore|Iowa City|41.66|-91.53|books
+IA|Beaverdale Books|Des Moines|41.62|-93.68|books
+IA|Snookies Malt Shop|Des Moines|41.60|-93.68|icecream
+IA|Ritual Cafe|Des Moines|41.58|-93.62|coffee
+IA|Mars Cafe|Des Moines|41.60|-93.64|coffee
+KS|Watermark Books & Cafe|Wichita|37.69|-97.30|books
+KS|The Raven Book Store|Lawrence|38.97|-95.24|books
+KS|Joe's Kansas City Bar-B-Que|Kansas City|39.07|-94.63|bbq
+KS|Radina's Coffeehouse|Manhattan|39.18|-96.57|coffee
+KS|Sunflower Outdoor & Bike Shop|Lawrence|38.97|-95.24|boutique
+KY|Carmichael's Bookstore|Louisville|38.24|-85.72|books
+KY|Joseph-Beth Booksellers|Lexington|38.01|-84.51|books
+KY|Heine Brothers' Coffee|Louisville|38.24|-85.72|coffee
+KY|Please & Thank You|Louisville|38.25|-85.75|coffee
+KY|The Comfy Cow|Louisville|38.24|-85.72|icecream
+KY|Crank & Boom Craft Ice Cream|Lexington|38.04|-84.49|icecream
+LA|Cafe Du Monde|New Orleans|29.96|-90.06|restaurant
+LA|Octavia Books|New Orleans|29.92|-90.11|books
+LA|Garden District Book Shop|New Orleans|29.93|-90.08|books
+LA|Hansen's Sno-Bliz|New Orleans|29.93|-90.10|icecream
+LA|Louisiana Music Factory|New Orleans|29.96|-90.06|records
+LA|Gambino's Bakery|Metairie|29.98|-90.15|bakery
+ME|The Holy Donut|Portland|43.66|-70.26|donut
+ME|Longfellow Books|Portland|43.66|-70.26|books
+ME|Bard Coffee|Portland|43.66|-70.26|coffee
+ME|Becky's Diner|Portland|43.65|-70.26|restaurant
+ME|Gelato Fiasco|Brunswick|43.91|-69.97|icecream
+ME|Sherman's Maine Coast Book Shops|Bar Harbor|44.39|-68.20|books
+MD|The Ivy Bookshop|Baltimore|39.36|-76.64|books
+MD|Atomic Books|Baltimore|39.33|-76.63|books
+MD|The Charmery|Baltimore|39.33|-76.63|icecream
+MD|Zeke's Coffee|Baltimore|39.35|-76.56|coffee
+MD|Thrasher's French Fries|Ocean City|38.34|-75.08|restaurant
+MD|Old Fox Books|Annapolis|38.98|-76.49|books
+MA|Harvard Book Store|Cambridge|42.37|-71.12|books
+MA|Brookline Booksmith|Brookline|42.34|-71.12|books
+MA|Mike's Pastry|Boston|42.36|-71.05|bakery
+MA|Flour Bakery + Cafe|Boston|42.35|-71.07|bakery
+MA|Toscanini's|Cambridge|42.36|-71.10|icecream
+MA|J.P. Licks|Boston|42.31|-71.11|icecream
+MA|Newbury Comics|Boston|42.35|-71.08|records
+MI|Literati Bookstore|Ann Arbor|42.28|-83.75|books
+MI|Zingerman's Delicatessen|Ann Arbor|42.28|-83.75|deli
+MI|Avalon International Breads|Detroit|42.35|-83.06|bakery
+MI|Great Lakes Coffee|Detroit|42.35|-83.06|coffee
+MI|Schuler Books|Grand Rapids|42.91|-85.57|books
+MI|Moomers Homemade Ice Cream|Traverse City|44.76|-85.62|icecream
+MN|Birchbark Books|Minneapolis|44.96|-93.31|books
+MN|Magers & Quinn Booksellers|Minneapolis|44.95|-93.30|books
+MN|Red Balloon Bookshop|St. Paul|44.94|-93.15|books
+MN|Electric Fetus|Minneapolis|44.96|-93.27|records
+MN|Sebastian Joe's|Minneapolis|44.96|-93.29|icecream
+MN|Glam Doll Donuts|Minneapolis|44.95|-93.28|donut
+MS|Square Books|Oxford|34.37|-89.52|books
+MS|Lemuria Books|Jackson|32.34|-90.16|books
+MS|Bottletree Bakery|Oxford|34.37|-89.52|bakery
+MS|Cups Espresso Cafe|Jackson|32.32|-90.17|coffee
+MS|The Mayflower Cafe|Jackson|32.30|-90.18|restaurant
+MO|Left Bank Books|St. Louis|38.64|-90.26|books
+MO|Ted Drewes Frozen Custard|St. Louis|38.59|-90.29|icecream
+MO|Vintage Vinyl|St. Louis|38.66|-90.31|records
+MO|Messenger Coffee|Kansas City|39.09|-94.58|coffee
+MO|Gates Bar-B-Q|Kansas City|39.05|-94.56|bbq
+MT|Fact & Fiction|Missoula|46.87|-113.99|books
+MT|Big Dipper Ice Cream|Missoula|46.87|-114.00|icecream
+MT|Country Bookshelf|Bozeman|45.68|-111.04|books
+MT|Montana Coffee Traders|Whitefish|48.41|-114.34|coffee
+NE|Jackson Street Booksellers|Omaha|41.25|-95.93|books
+NE|The Bookworm|Omaha|41.26|-96.03|books
+NE|Ted & Wally's Ice Cream|Omaha|41.26|-95.93|icecream
+NE|Ivanna Cone|Lincoln|40.81|-96.70|icecream
+NE|Indigo Bridge Books|Lincoln|40.81|-96.71|books
+NE|Runza|Lincoln|40.81|-96.70|restaurant
+NV|The Writer's Block|Las Vegas|36.17|-115.14|books
+NV|Sunrise Coffee|Las Vegas|36.11|-115.12|coffee
+NV|Sundance Books and Music|Reno|39.52|-119.81|books
+NV|Hub Coffee Roasters|Reno|39.52|-119.81|coffee
+NH|Gibson's Bookstore|Concord|43.20|-71.54|books
+NH|Water Street Bookstore|Exeter|42.98|-70.95|books
+NH|Red Arrow Diner|Manchester|42.99|-71.46|restaurant
+NH|Polly's Pancake Parlor|Sugar Hill|44.21|-71.80|restaurant
+NH|Granite State Candy Shoppe|Concord|43.21|-71.54|candy
+NJ|Watchung Booksellers|Montclair|40.83|-74.21|books
+NJ|Labyrinth Books|Princeton|40.35|-74.66|books
+NJ|Small World Coffee|Princeton|40.35|-74.66|coffee
+NJ|Holsten's|Bloomfield|40.81|-74.19|icecream
+NJ|Delicious Orchards|Colts Neck|40.29|-74.17|market
+NM|Bookworks|Albuquerque|35.11|-106.62|books
+NM|Collected Works Bookstore|Santa Fe|35.69|-105.94|books
+NM|Frontier Restaurant|Albuquerque|35.08|-106.62|restaurant
+NM|Sadie's of New Mexico|Albuquerque|35.14|-106.63|restaurant
+NM|Iconik Coffee Roasters|Santa Fe|35.67|-105.95|coffee
+NY|Strand Book Store|New York City|40.73|-73.99|books
+NY|McNally Jackson Books|New York City|40.72|-73.99|books
+NY|Russ & Daughters|New York City|40.72|-73.99|deli
+NY|Katz's Delicatessen|New York City|40.72|-73.99|deli
+NY|Levain Bakery|New York City|40.78|-73.98|bakery
+NY|Talking Leaves Books|Buffalo|42.94|-78.84|books
+NY|Abbott's Frozen Custard|Rochester|43.25|-77.60|icecream
+NY|Dinosaur Bar-B-Que|Syracuse|43.05|-76.16|bbq
+NY|The Book House of Stuyvesant Plaza|Albany|42.70|-73.83|books
+NC|Malaprop's Bookstore/Cafe|Asheville|35.60|-82.55|books
+NC|Quail Ridge Books|Raleigh|35.84|-78.65|books
+NC|Flyleaf Books|Chapel Hill|35.94|-79.04|books
+NC|Park Road Books|Charlotte|35.17|-80.85|books
+NC|Sunrise Biscuit Kitchen|Chapel Hill|35.93|-79.03|restaurant
+NC|Counter Culture Coffee|Durham|35.99|-78.90|coffee
+ND|Zandbroz Variety|Fargo|46.88|-96.79|gifts
+ND|Nichole's Fine Pastry|Fargo|46.87|-96.79|bakery
+ND|Twenty Below Coffee|Fargo|46.88|-96.79|coffee
+OH|The Book Loft of German Village|Columbus|39.95|-82.99|books
+OH|Jeni's Splendid Ice Creams|Columbus|39.98|-83.00|icecream
+OH|Graeter's Ice Cream|Cincinnati|39.10|-84.51|icecream
+OH|Joseph-Beth Booksellers|Cincinnati|39.16|-84.42|books
+OH|Mac's Backs Books on Coventry|Cleveland Heights|41.51|-81.58|books
+OH|Mitchell's Homemade Ice Cream|Cleveland|41.48|-81.71|icecream
+OH|Phoenix Coffee|Cleveland|41.50|-81.69|coffee
+OK|Full Circle Bookstore|Oklahoma City|35.52|-97.53|books
+OK|Magic City Books|Tulsa|36.16|-95.99|books
+OK|Andolini's Pizzeria|Tulsa|36.14|-95.97|pizza
+OK|Big Truck Tacos|Oklahoma City|35.49|-97.52|restaurant
+OK|Elemental Coffee|Oklahoma City|35.47|-97.52|coffee
+OR|Powell's City of Books|Portland|45.52|-122.68|books
+OR|Voodoo Doughnut|Portland|45.52|-122.67|donut
+OR|Blue Star Donuts|Portland|45.52|-122.68|donut
+OR|Salt & Straw|Portland|45.53|-122.70|icecream
+OR|Tsunami Books|Eugene|44.04|-123.09|books
+OR|Sisters Coffee Company|Sisters|44.29|-121.55|coffee
+PA|Joseph Fox Bookshop|Philadelphia|39.95|-75.17|books
+PA|Federal Donuts|Philadelphia|39.94|-75.15|donut
+PA|Shane Confectionery|Philadelphia|39.95|-75.14|candy
+PA|Commonplace Coffee|Pittsburgh|40.45|-79.93|coffee
+PA|Prantl's Bakery|Pittsburgh|40.45|-79.93|bakery
+PA|Primanti Bros.|Pittsburgh|40.45|-79.99|restaurant
+RI|Books on the Square|Providence|41.83|-71.39|books
+RI|Coffee Exchange|Providence|41.82|-71.41|coffee
+RI|Ellie's Bakery|Providence|41.82|-71.41|bakery
+RI|Iggy's Doughboys & Chowder House|Warwick|41.70|-71.42|restaurant
+RI|Del's Lemonade|Cranston|41.78|-71.44|icecream
+RI|Craftland|Providence|41.82|-71.41|gifts
+SC|Blue Bicycle Books|Charleston|32.78|-79.93|books
+SC|Callie's Hot Little Biscuit|Charleston|32.78|-79.93|bakery
+SC|Kudu Coffee & Craft Beer|Charleston|32.79|-79.94|coffee
+SC|M. Judson Booksellers|Greenville|34.85|-82.40|books
+SD|Wall Drug Store|Wall|43.99|-102.24|tourist
+SD|Mitzi's Books|Rapid City|44.08|-103.23|books
+SD|Black Hills Bagels|Rapid City|44.08|-103.23|bakery
+SD|Josiah's Coffeehouse & Cafe|Sioux Falls|43.55|-96.73|coffee
+TN|Parnassus Books|Nashville|36.11|-86.81|books
+TN|Bongo Java|Nashville|36.13|-86.80|coffee
+TN|Prince's Hot Chicken|Nashville|36.16|-86.78|restaurant
+TN|Goo Goo Shop|Nashville|36.16|-86.78|candy
+TN|Novel|Memphis|35.12|-89.94|books
+TN|Muddy's Bake Shop|Memphis|35.11|-89.96|bakery
+TN|Union Ave Books|Knoxville|35.96|-83.92|books
+TN|Clumpies Ice Cream Co.|Chattanooga|35.05|-85.31|icecream
+TX|BookPeople|Austin|30.27|-97.75|books
+TX|Waterloo Records|Austin|30.27|-97.75|records
+TX|Kerbey Lane Cafe|Austin|30.29|-97.75|restaurant
+TX|Brazos Bookstore|Houston|29.73|-95.42|books
+TX|Blue Willow Bookshop|Houston|29.78|-95.56|books
+TX|Interabang Books|Dallas|32.86|-96.80|books
+TX|Mi Tierra Cafe y Panaderia|San Antonio|29.42|-98.50|restaurant
+TX|The Twig Book Shop|San Antonio|29.44|-98.48|books
+TX|L&J Cafe|El Paso|31.79|-106.45|restaurant
+UT|Weller Book Works|Salt Lake City|40.76|-111.87|books
+UT|The King's English Bookshop|Salt Lake City|40.73|-111.84|books
+UT|Ken Sanders Rare Books|Salt Lake City|40.76|-111.88|books
+UT|Central Book Exchange|Salt Lake City|40.72|-111.86|books
+UT|The Legendarium|Salt Lake City|40.75|-111.87|books
+UT|Lovebound Library|Salt Lake City|40.75|-111.87|books
+UT|Hip & Humble|Salt Lake City|40.75|-111.86|boutique
+UT|Caputo's Market & Deli|Salt Lake City|40.76|-111.90|deli
+UT|Gourmandise The Bakery|Salt Lake City|40.76|-111.89|bakery
+UT|Fountain Records|Salt Lake City|40.76|-111.89|records
+UT|Baby's Bagels|Salt Lake City|40.76|-111.89|bakery
+UT|Cafe Shambala|Salt Lake City|40.77|-111.87|restaurant
+UT|Red Iguana|Salt Lake City|40.77|-111.91|restaurant
+UT|Publik Coffee Roasters|Salt Lake City|40.76|-111.90|coffee
+VT|Phoenix Books|Burlington|44.48|-73.21|books
+VT|Bear Pond Books|Montpelier|44.26|-72.58|books
+VT|Northshire Bookstore|Manchester|43.16|-73.07|books
+VT|Myers Bagel Bakery|Burlington|44.47|-73.21|bakery
+VT|Lake Champlain Chocolates|Burlington|44.48|-73.21|candy
+VA|Fountain Bookstore|Richmond|37.53|-77.43|books
+VA|Chop Suey Books|Richmond|37.55|-77.45|books
+VA|Sugar Shack Donuts|Richmond|37.55|-77.46|donut
+VA|Rostov's Coffee & Tea|Richmond|37.55|-77.45|coffee
+VA|Prince Books|Norfolk|36.85|-76.29|books
+VA|Doumar's Cones & Barbecue|Norfolk|36.87|-76.29|icecream
+VA|New Dominion Bookshop|Charlottesville|38.03|-78.48|books
+WA|Elliott Bay Book Company|Seattle|47.61|-122.32|books
+WA|Third Place Books|Seattle|47.68|-122.31|books
+WA|Molly Moon's Homemade Ice Cream|Seattle|47.66|-122.31|icecream
+WA|Top Pot Doughnuts|Seattle|47.62|-122.34|donut
+WA|Auntie's Bookstore|Spokane|47.66|-117.42|books
+WA|Village Books|Bellingham|48.72|-122.50|books
+WA|King's Books|Tacoma|47.25|-122.45|books
+WV|Taylor Books|Charleston|38.35|-81.63|books
+WV|Ellen's Homemade Ice Cream|Charleston|38.35|-81.63|icecream
+WV|Jim's Steak & Spaghetti House|Huntington|38.42|-82.44|restaurant
+WV|Black Bear Burritos|Morgantown|39.63|-79.96|restaurant
+WI|Boswell Book Company|Milwaukee|43.06|-87.89|books
+WI|Kopp's Frozen Custard|Milwaukee|43.04|-87.91|icecream
+WI|Leon's Frozen Custard|Milwaukee|42.97|-87.95|icecream
+WI|A Room of One's Own|Madison|43.07|-89.39|books
+WI|Mystery to Me|Madison|43.07|-89.43|books
+WI|Michael's Frozen Custard|Madison|43.07|-89.40|icecream
+WI|Kavarna Coffeehouse|Green Bay|44.51|-88.01|coffee
+WY|Wind City Books|Casper|42.85|-106.32|books
+WY|Valley Bookstore|Jackson|43.48|-110.76|books
+WY|Persephone Bakery|Jackson|43.48|-110.76|bakery
+WY|Moo's Gourmet Ice Cream|Jackson|43.48|-110.76|icecream
+# --- batch 2 ---
+AL|Page & Palette|Fairhope|30.52|-87.90|books
+AL|Continental Bakery|Birmingham|33.49|-86.79|bakery
+AL|Saw's BBQ|Homewood|33.47|-86.80|bbq
+AK|Fire Island Rustic Bakeshop|Anchorage|61.21|-149.91|bakery
+AK|Hearthside Books|Juneau|58.30|-134.41|books
+AZ|The Poisoned Pen Bookstore|Scottsdale|33.49|-111.92|books
+AZ|Cartel Coffee Lab|Tempe|33.42|-111.94|coffee
+AZ|Macy's European Coffee House|Flagstaff|35.19|-111.65|coffee
+AR|Rick's Bakery|Fayetteville|36.06|-94.16|bakery
+AR|Community Bakery|Little Rock|34.74|-92.28|bakery
+AR|That Bookstore in Blytheville|Blytheville|35.93|-89.92|books
+AR|Ozark Natural Foods|Fayetteville|36.08|-94.17|market
+CA|Book Passage|Corte Madera|37.93|-122.51|books
+CA|Kepler's Books|Menlo Park|37.45|-122.18|books
+CA|Swensen's Ice Cream|San Francisco|37.80|-122.42|icecream
+CA|Fosselman's Ice Cream|Alhambra|34.08|-118.13|icecream
+CA|Mitchell's Ice Cream|San Francisco|37.74|-122.42|icecream
+CA|Bob's Donuts|San Francisco|37.79|-122.42|donut
+CO|Sweet Cow Ice Cream|Louisville|39.98|-105.13|icecream
+CO|Moe's Broadway Bagel|Boulder|40.02|-105.27|bakery
+CO|Trident Booksellers & Cafe|Boulder|40.02|-105.28|books
+CT|Bishop's Orchards|Guilford|41.29|-72.68|market
+CT|Rein's New York Style Deli|Vernon|41.84|-72.46|deli
+DE|Woodside Farm Creamery|Hockessin|39.79|-75.70|icecream
+DE|Bing's Bakery|Newark|39.68|-75.75|bakery
+DC|Capitol Hill Books|Washington|38.88|-76.99|books
+FL|Writer's Block Bookstore|Winter Park|28.60|-81.35|books
+FL|The Hyppo|St. Augustine|29.89|-81.31|icecream
+FL|Satchel's Pizza|Gainesville|29.68|-82.30|pizza
+FL|Midtown Reader|Tallahassee|30.45|-84.28|books
+GA|Avid Bookshop|Athens|33.96|-83.38|books
+GA|Mercier Orchards|Blue Ridge|34.86|-84.33|market
+HI|Basically Books|Hilo|19.72|-155.08|books
+HI|Ted's Bakery|Sunset Beach|21.67|-158.04|bakery
+HI|Komoda Store & Bakery|Makawao|20.86|-156.31|bakery
+HI|Tex Drive In|Honokaa|20.08|-155.47|restaurant
+ID|Goody's Soda Fountain|Boise|43.62|-116.20|icecream
+ID|Boise Co-op|Boise|43.63|-116.21|market
+ID|Hudson's Hamburgers|Coeur d'Alene|47.68|-116.78|restaurant
+ID|BookPeople of Moscow|Moscow|46.73|-117.00|books
+IL|Lou Mitchell's|Chicago|41.88|-87.64|restaurant
+IL|Superdawg Drive-In|Chicago|41.99|-87.79|restaurant
+IL|Seminary Co-op Bookstores|Chicago|41.79|-87.60|books
+IN|Long's Bakery|Indianapolis|39.77|-86.19|donut
+IN|Indy Reads Books|Indianapolis|39.77|-86.15|books
+IA|Bauder Pharmacy|Des Moines|41.60|-93.68|icecream
+IA|Hamburg Inn No. 2|Iowa City|41.66|-91.53|restaurant
+KS|Rainy Day Books|Fairway|39.02|-94.63|books
+KS|Sylas & Maddy's Homemade Ice Cream|Lawrence|38.97|-95.24|icecream
+KS|Nifty Nut House|Wichita|37.69|-97.33|candy
+KS|Bobo's Drive In|Topeka|39.04|-95.70|restaurant
+MI|Source Booksellers|Detroit|42.36|-83.07|books
+MI|Washtenaw Dairy|Ann Arbor|42.27|-83.75|icecream
+MN|Wild Rumpus Books|Minneapolis|44.91|-93.31|books
+MS|Turnrow Book Co.|Greenwood|33.52|-90.18|books
+MS|Bully's Restaurant|Jackson|32.32|-90.20|restaurant
+MO|Crown Candy Kitchen|St. Louis|38.65|-90.19|candy
+MT|The Book Exchange|Missoula|46.86|-114.02|books
+MT|Sweet Peaks Ice Cream|Whitefish|48.41|-114.34|icecream
+MT|Montana Ale Works|Bozeman|45.68|-111.03|restaurant
+NV|Freed's Bakery|Las Vegas|36.06|-115.13|bakery
+NV|Louis' Basque Corner|Reno|39.53|-119.81|restaurant
+NV|Comma Coffee|Carson City|39.16|-119.77|coffee
+NH|Puritan Backroom|Manchester|43.03|-71.44|restaurant
+NJ|Clinton Book Shop|Clinton|40.64|-74.91|books
+NJ|Thomas Sweet Ice Cream|Princeton|40.35|-74.66|icecream
+NM|Golden Crown Panaderia|Albuquerque|35.10|-106.66|bakery
+NM|Kakawa Chocolate House|Santa Fe|35.68|-105.93|candy
+NY|Books Are Magic|New York City|40.68|-73.99|books
+NY|Purity Ice Cream|Ithaca|42.44|-76.50|icecream
+NY|Paula's Donuts|Buffalo|42.97|-78.82|donut
+NC|The Regulator Bookshop|Durham|36.01|-78.92|books
+ND|Red Raven Espresso Parlor|Fargo|46.88|-96.79|coffee
+ND|Widman's Candy Shop|Grand Forks|47.92|-97.03|candy
+ND|Sandy's Donuts|Fargo|46.87|-96.83|donut
+ND|Bread Poets Baking Co.|Bismarck|46.81|-100.78|bakery
+OH|Schmidt's Sausage Haus|Columbus|39.95|-82.99|restaurant
+OH|Tony Packo's|Toledo|41.65|-83.51|restaurant
+OK|Ida Red|Tulsa|36.15|-95.98|gifts
+OK|Cuppies & Joe|Oklahoma City|35.48|-97.51|coffee
+OK|Antoinette Baking Co.|Tulsa|36.15|-95.98|bakery
+PA|Bassetts Ice Cream|Philadelphia|39.95|-75.16|icecream
+PA|Oakmont Bakery|Oakmont|40.52|-79.84|bakery
+SC|Drip Coffee|Columbia|34.00|-81.03|coffee
+SC|Swamp Rabbit Cafe & Grocery|Greenville|34.86|-82.41|market
+SC|Croissants Bistro & Bakery|Myrtle Beach|33.72|-78.86|bakery
+SD|Zandbroz Variety|Sioux Falls|43.55|-96.73|gifts
+SD|Purple Pie Place|Custer|43.77|-103.60|restaurant
+TN|Grimey's New & Preloved Music|Nashville|36.15|-86.79|records
+TX|Amy's Ice Creams|Austin|30.27|-97.75|icecream
+TX|Murder by the Book|Houston|29.73|-95.43|books
+TX|Joe T. Garcia's|Fort Worth|32.77|-97.35|restaurant
+VT|Cold Hollow Cider Mill|Waterbury|44.37|-72.75|market
+VT|Muddy Waters|Burlington|44.48|-73.21|coffee
+VA|One More Page Books|Arlington|38.88|-77.17|books
+WA|Ada's Technical Books & Cafe|Seattle|47.62|-122.31|books
+WV|Country Club Bakery|Fairmont|39.48|-80.14|bakery
+WV|Blue Moose Cafe|Morgantown|39.63|-79.95|coffee
+WY|Night Heron Books & Coffeehouse|Laramie|41.31|-105.59|books
+WY|Coal Creek Coffee|Laramie|41.31|-105.59|coffee
+WY|Snake River Brewing|Jackson|43.48|-110.76|restaurant
+WY|The Bunnery Bakery|Jackson|43.48|-110.76|bakery

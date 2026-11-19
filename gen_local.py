@@ -78,6 +78,18 @@ CITY = [
  ("Environmental Services Tech","Hospitals in {c}","hands-on","full-time",15,19,18,0,None,"","Cleaning;Attention to detail;Safety","H;D;V;R;P;T","Clean and disinfect patient rooms at hospitals in {c}. A common way into healthcare."),
  ("Bus Operator Trainee","{c}-area public transit","hands-on","full-time",20,27,21,0,"highschool","CDL license (paid training)","Driving;Customer service;Safety",GOV,"Drive city buses around {c}. Transit agencies pay for CDL training and offer union benefits."),
 ]
+CITY2 = [
+ ("Substitute Teacher","{c} public schools","brainy","part-time",15,22,18,0,"highschool","","Patience;Communication;Classroom management","F","Fill in for teachers in {c} schools. Pick the days you want. Some districts ask for some college."),
+ ("Crossing Guard","{c}-area schools","people","part-time",13,18,18,0,None,"","Safety;Reliability;Friendly","F","Help kids cross the street safely before and after school in {c}. Short shifts."),
+ ("Animal Shelter Attendant","{c}-area animal services","care","part-time",14,18,18,0,None,"","Animals;Cleaning;Compassion","F;P","Feed, clean up after and care for shelter animals in {c}."),
+ ("Street Maintenance Worker","City of {c}","hands-on","full-time",17,23,18,0,"highschool","Driver's license","Tools;Outdoor work;Safety","H;D;V;R;P","Fill potholes, fix signs and keep {c}'s streets safe. City benefits."),
+ ("Police Records Clerk","{c} Police Department","brainy","full-time",17,22,18,0,"highschool","","Typing;Accuracy;Customer service","H;D;V;R;P","Enter reports and help the public at the front desk of the {c} police department."),
+ ("Election Poll Worker","{c}-area elections office","people","temporary",15,20,16,0,None,"","Customer service;Accuracy;Friendly","F","Help voters on election days in {c}. Paid training. Many places take high school students 16+."),
+ ("Hospital Dietary Aide","Hospitals in {c}","people","part-time",14,18,16,0,None,"","Food prep;Cleaning;Teamwork","F;H;E","Prep and deliver meal trays to patients at hospitals in {c}."),
+ ("Hospital Unit Secretary","Hospitals in {c}","people","full-time",16,21,18,0,"highschool","","Computers;Phone skills;Organization","H;D;V;R;P;T","Answer phones and keep charts organized for a nursing unit at hospitals in {c}."),
+ ("Pharmacy Technician Trainee","Hospitals in {c}","care","full-time",17,22,18,0,"highschool","","Accuracy;Math;Attention to detail","H;D;V;R;P;T","Fill and deliver medicine orders at hospitals in {c}. Many hospitals pay for certification."),
+ ("Before & After School Aide","{c} public schools","care","part-time",13,17,16,0,None,"","Childcare;Games;Patience","F","Run games and homework time for kids before and after school in {c}."),
+]
 UNIV = [
  ("Dining Services Worker","{u}","people","part-time",13,17,16,0,None,"","Food prep;Customer service;Cleaning","F;E;P","Serve food and clean in campus dining halls at {u}. Often open to non-students."),
  ("Library Assistant","{u}","brainy","part-time",12,16,17,0,None,"","Organization;Customer service;Computers","F","Check out books and help students at {u}'s libraries."),
@@ -110,7 +122,7 @@ def make(t, st, place, lat, lon, fmt):
 out = []
 for st, (name, cities, (u, ucity, ulat, ulon)) in S.items():
     for (c, lat, lon) in cities:
-        for t in CITY: out.append(make(t, st, c, lat, lon, {"c": c}))
+        for t in CITY + CITY2: out.append(make(t, st, c, lat, lon, {"c": c}))
     for t in UNIV: out.append(make(t, st, ucity, ulat, ulon, {"u": u}))
     for t in STATE: out.append(make(t, st, "", None, None, {"n": name}))
 lib = json.load(open("jobs-library.json"))

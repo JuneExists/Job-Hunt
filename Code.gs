@@ -36,12 +36,14 @@ const CONFIG = {
   NOTIFY_EMAIL: '',
 
   // ---- Phone push notifications (free, works on iPhone and Android) ----
+  // The Job Hunt Setup tab fills this in for you when you copy the script.
+  // To do it by hand:
   // 1. Install the free "ntfy" app: iPhone https://apps.apple.com/app/id1625396347
   //    Android https://play.google.com/store/apps/details?id=io.heckel.ntfy
-  // 2. In the app tap +, and subscribe to a topic name only you would guess,
-  //    like "june-jobs-7f3k9q". (Anyone who knows the name can see the alerts,
-  //    so make it random.)
-  // 3. Put the same topic name here.
+  // 2. Open it, allow notifications, tap +, type a channel ("topic") name only
+  //    you would guess, like "june-jobs-7f3k9q", and tap Subscribe.
+  //    (Anyone who knows the name can see the alerts, so make it random.)
+  // 3. Put the same name between the quotes below.
   NTFY_TOPIC: '',
 
   // ---- Text message alerts (optional): fill in ONE of the two options ----
