@@ -36,7 +36,8 @@ const CONFIG = {
   NOTIFY_EMAIL: '',
 
   // ---- Phone push notifications (free, works on iPhone and Android) ----
-  // 1. Install the free "ntfy" app from the App Store.
+  // 1. Install the free "ntfy" app: iPhone https://apps.apple.com/app/id1625396347
+  //    Android https://play.google.com/store/apps/details?id=io.heckel.ntfy
   // 2. In the app tap +, and subscribe to a topic name only you would guess,
   //    like "june-jobs-7f3k9q". (Anyone who knows the name can see the alerts,
   //    so make it random.)
