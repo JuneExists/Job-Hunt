@@ -273,31 +273,6 @@ nav button.on{background:var(--cyan-soft);border:2.5px solid var(--cyan);box-sha
 .hint .linkish{background:none;border:0;padding:0;color:var(--cyan);font:800 15px Nunito,sans-serif;cursor:pointer;text-decoration:underline dashed;text-underline-offset:4px}
 @media (prefers-reduced-motion: reduce){.card.job,.chip,.kpi,.banner,nav button.on,.sortrow button.on,#pageTitle{transform:none}}
 
-/* ================= STICKY NOTES =================
-   Job cards are post-it notes in deep cool tints with a peeled corner; small buttons are mini notes. */
-:root{--n1:#1c2c4f;--n2:#163a33;--n3:#2c2250;--n4:#103a45;--fold:rgba(255,255,255,.2)}
-.note,.card.job,.sortrow button,.btn.ghost,.kpi{--note:var(--n1)}
-.card.job:nth-of-type(4n+2),.sortrow button:nth-child(4n+2),.btn.ghost:nth-of-type(4n+2),.kpi:nth-child(4n+2){--note:var(--n2)}
-.card.job:nth-of-type(4n+3),.sortrow button:nth-child(4n+3),.btn.ghost:nth-of-type(4n+3),.kpi:nth-child(4n+3){--note:var(--n3)}
-.card.job:nth-of-type(4n+4),.sortrow button:nth-child(4n+4),.btn.ghost:nth-of-type(4n+4),.kpi:nth-child(4n+4){--note:var(--n4)}
-/* paper with a folded-up bottom-right corner */
-.card.job,.sortrow button,.btn.ghost,.kpi{
-  background:linear-gradient(135deg,var(--fold) 0 50%,transparent 50%) bottom right/var(--fs,26px) var(--fs,26px) no-repeat,
-             linear-gradient(315deg,transparent calc(var(--fs,26px) * .7),var(--note) calc(var(--fs,26px) * .7));
-  border:0}
-.card.job{--fs:34px;border-radius:3px;border-top:7px solid var(--stripe,var(--outline));padding-top:20px;
-  box-shadow:0 18px 16px -14px rgba(0,0,0,.95),3px 4px 0 rgba(0,0,0,.55)}
-.card.job::after{display:none}
-.card.job .comp{color:rgba(238,242,255,.72)}
-.card.job .hint{color:rgba(238,242,255,.66)}
-.card.job .chip{box-shadow:none;background-color:rgba(0,0,0,.28)}
-.sortrow button{--fs:14px;border-radius:3px;box-shadow:2px 3px 0 rgba(0,0,0,.7);color:var(--ink)}
-.sortrow button.on{background:linear-gradient(135deg,rgba(255,255,255,.35) 0 50%,transparent 50%) bottom right/14px 14px no-repeat,linear-gradient(315deg,transparent 10px,var(--ink) 10px);color:#000;box-shadow:2px 3px 0 var(--brand)}
-.btn.ghost{--fs:16px;border-radius:4px;box-shadow:3px 4px 0 rgba(0,0,0,.75)}
-.btn.ghost:active{box-shadow:1px 1px 0 rgba(0,0,0,.75)}
-.kpi{--fs:16px;border-radius:3px;box-shadow:3px 4px 0 rgba(0,0,0,.75)}
-.minigoal{border-radius:4px}
-@media (prefers-reduced-motion: reduce){.sortrow button.on{transform:none}}
 </style>
 </head>
 <body>
@@ -1107,7 +1082,8 @@ async function cloudInit(){
       if (me && me.username && me.username !== S.myName) { S.myName = me.username; S.profile = {...S.profile, username: me.username}; saveProfile(); }
     }
     await cloudLoadReviews(); await loadSpots(); renderAll(); checkGate();
-    if (cloudUser) { vaultPull().catch(() => {}); checkAdmin(); }
+    if (cloudUser) { vaultPull().catch(() => {}); checkAdmin(); } else renderOwner();
+    renderBanners();
     const u = $("#unameSave"); if (u && $("#sheetBg").dataset.locked && !$("#haveAccount") && !S.myName) { u.insertAdjacentHTML("afterend", `<button class="btn ghost block" id="haveAccount" style="margin-top:10px">🔑 I already have an account</button>`); $("#haveAccount").addEventListener("click", () => { delete $("#sheetBg").dataset.locked; closeSheet(); openLogin(); }); }
   } catch(e){ console.error(e); sb = null; banner("Couldn't reach the shared reviews right now. Your own stuff still works."); }
 }
@@ -1195,6 +1171,25 @@ function openLogin(){
   });
 }
 /* After a correct password on this phone: make sure the shared account is signed in, or create it for older accounts. */
+function openConnect(){
+  openSheet(`<div class="sheet-head"><h2>🔗 Connect your account</h2><button class="x" data-close aria-label="Close">×</button></div>
+    <p class="hint" style="margin-top:-4px">Type your Job Hunt password once to save <b>@${esc(S.myName || "")}</b> for everyone, share your reviews, and sync to your other phones.</p>
+    <form class="box" id="connectForm"><input type="text" name="username" autocomplete="username" value="${esc(S.myName || "")}" hidden>
+      <div class="field"><label>Password</label><input id="connectPw" type="password" autocomplete="current-password" required></div>
+      <div class="hint" id="connectMsg" style="min-height:20px;margin-bottom:8px"></div>
+      <button class="btn primary block" type="submit">Connect</button></form>`);
+  $("#connectForm").addEventListener("submit", async e => {
+    e.preventDefault(); const pw = $("#connectPw").value, m = $("#connectMsg");
+    m.innerHTML = `<span class="spin"></span> Connecting…`;
+    const h = await hashPw(pw, S.profile.pw.salt);
+    if (h.hash !== S.profile.pw.hash) { m.textContent = "That's not your password. Try again!"; return; }
+    await cloudAfterUnlock(pw);
+    if (cloudUser) { closeSheet(); toast("Connected ✓"); renderAll(); renderOwner(); renderBanners(); }
+    else m.textContent = "Couldn't connect right now. Try again in a bit.";
+  });
+}
+const needsConnect = () => !!(sb && !cloudUser && S.mode !== "db" && S.myName && S.profile.pw && S.profile.pw.hash && unlocked);
+document.addEventListener("click", e => { if (e.target.closest("[data-connect]")) { e.preventDefault(); openConnect(); } });
 async function cloudAfterUnlock(pw){
   if (!sb || cloudUser || !S.myName) return;
   try { await cloudLogIn(S.myName, pw); vaultPull().catch(() => {}); checkAdmin(); }
@@ -1301,11 +1296,12 @@ async function checkAdmin(){
 }
 async function renderOwner(){
   const el = $("#ownerBox"); if (!el) return;
-  if (!sb || !cloudUser) { el.innerHTML = ""; el.classList.add("hide"); return; }
+  if (!sb) { el.innerHTML = ""; el.classList.add("hide"); return; }
   el.classList.remove("hide");
+  if (!cloudUser) { el.innerHTML = `<h2>🛡️ App owner tools</h2><p class="hint" style="margin-top:0">For the person who runs this app. Connect your account first, then you can enter your owner code here.</p>${needsConnect() ? `<button class="btn primary block" data-connect="1">🔗 Connect my account</button>` : `<p class="hint">Log in or make an account to continue.</p>`}`; return; }
   if (!S.cloudAdmin) {
-    el.innerHTML = `<details><summary>🛡️ App owner tools</summary><p class="hint">Only for the person who runs this app. Enter your private owner code once.</p>
-      <div class="row"><input id="ownerCode" autocapitalize="characters" spellcheck="false" placeholder="Owner code" style="flex:1;min-width:160px"><button class="btn primary small" id="ownerGo">Unlock</button></div><div class="hint" id="ownerMsg"></div></details>`;
+    el.innerHTML = `<h2>🛡️ App owner tools</h2><p class="hint" style="margin-top:0">Only for the person who runs this app. Enter your private owner code once.</p>
+      <div class="row"><input id="ownerCode" autocapitalize="characters" spellcheck="false" placeholder="Owner code" style="flex:1;min-width:160px"><button class="btn primary small" id="ownerGo">Unlock</button></div><div class="hint" id="ownerMsg"></div>`;
     $("#ownerGo").addEventListener("click", async () => {
       const { data } = await sb.rpc("claim_admin", { p_code: $("#ownerCode").value }); if (data === true) { toast("You're the app owner 🛡️"); checkAdmin(); } else $("#ownerMsg").textContent = "That code didn't work.";
     });
@@ -1693,6 +1689,7 @@ function renderBanners(){
   if (S.mode !== "db" && window.claude) out.push(`<div class="banner">Heads up: your stuff is only saved on this device right now.</div>`);
   const nudge = S.jobs.filter(j => j.status === "Applied" && daysSince(j.lastFollowUp || j.appliedAt) >= 7).length;
   if (tab === "jobs" && nudge) out.push(`<div class="banner" style="background:var(--coral-soft);border-color:rgba(255,107,129,.3)">⏰ <b>${nudge} ${nudge === 1 ? "company hasn't" : "companies haven't"} replied in a week.</b> A friendly follow-up can really help. <a href="#" data-go="tracker">Send follow-ups</a></div>`);
+  try { if (needsConnect() && (tab === "jobs" || tab === "setup" || tab === "profile")) out.push(`<div class="banner" style="border-color:var(--cyan)">🔗 <b>One more step:</b> connect your account so <b>@${esc(S.myName)}</b> is saved for everyone and your stuff syncs. <a href="#" data-connect="1">Connect now</a></div>`); } catch(e){}
   extraBanners.forEach(b => out.push(`<div class="banner">${b}</div>`));
   $("#banners").innerHTML = out.join("");
 }
