@@ -2247,12 +2247,13 @@ function renderUname(){
   $("#changePw").addEventListener("click", () => askPassword(false));
   if (S.profile.pw && S.profile.pw.hash) { el.insertAdjacentHTML("beforeend", `<button type="button" class="btn ghost block small" id="logOutBtn" style="margin-top:10px">🚪 Log out</button><div class="hint" style="margin-top:6px">You stay logged in on this device unless you log out or don't open the app for 2 days.</div>`); $("#logOutBtn").addEventListener("click", logOut); }
 }
+const UNAME_EXAMPLES = ["sunny.side", "pixel.pal", "night.owl", "coffee.cat", "star.seeker", "lucky.duck", "cloud.nine", "go.getter"];
 function askUsername(required, retaken){
   if ($("#unameInput")) return;
   openSheet(`<div class="sheet-head"><h2>👋 ${required ? "Welcome! Pick a username" : "Change your username"}</h2>${required ? "" : `<button class="x" data-close aria-label="Close">×</button>`}</div>
     <p class="hint" style="margin-top:-4px">This is how you show up when you rate and review companies. Your real name stays private.</p>
     <div class="box">
-      <div class="field"><label>Username</label><div class="row" style="flex-wrap:nowrap"><span style="font-size:22px;font-weight:900;color:var(--cyan)">@</span><input id="unameInput" maxlength="20" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="june.the.human" value="${esc(S.myName || "")}"></div></div>
+      <div class="field"><label>Username</label><div class="row" style="flex-wrap:nowrap"><span style="font-size:22px;font-weight:900;color:var(--cyan)">@</span><input id="unameInput" maxlength="20" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="${esc(UNAME_EXAMPLES[Math.random() * UNAME_EXAMPLES.length | 0])}" value="${esc(S.myName || "")}"></div></div>
       <div class="hint" id="unameMsg">3–20 characters: letters, numbers, _ and .</div>
       <button class="btn primary block" id="unameSave" style="margin-top:12px">${required ? "Let's go! 🚀" : "Save"}</button>
     </div>
