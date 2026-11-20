@@ -273,6 +273,12 @@ nav button.on{background:var(--cyan-soft);border:2.5px solid var(--cyan);box-sha
 .hint .linkish{background:none;border:0;padding:0;color:var(--cyan);font:800 15px Nunito,sans-serif;cursor:pointer;text-decoration:underline dashed;text-underline-offset:4px}
 @media (prefers-reduced-motion: reduce){.card.job,.chip,.kpi,.banner,nav button.on,.sortrow button.on,#pageTitle{transform:none}}
 
+
+/* quick tour */
+#tourLayer{position:fixed;inset:0;z-index:95}
+#tourSpot{position:fixed;border-radius:16px;border:3px solid var(--cyan);box-shadow:0 0 0 9999px rgba(2,4,10,.78);transition:all .25s ease;pointer-events:none}
+#tourCard{position:fixed;left:14px;right:14px;max-width:520px;margin:0 auto;background:var(--card);border:2.5px solid var(--cyan);border-radius:20px;padding:16px 18px;box-shadow:6px 6px 0 #000;transition:top .25s ease}
+@media (prefers-reduced-motion: reduce){#tourSpot,#tourCard{transition:none}}
 </style>
 </head>
 <body>
@@ -499,6 +505,7 @@ nav button.on{background:var(--cyan-soft);border:2.5px solid var(--cyan);box-sha
         <p style="margin:6px 0">Drag this to your bookmarks bar: <a class="bm" id="bookmarklet" href="#">⚡ Autofill</a></p></details>
       <p class="hint">Changed your profile? Copy the code again and update the bookmark.</p>
     </div>
+    <div class="card"><h2>🗺️ Quick tour</h2><p class="hint" style="margin-top:0">A one-minute walk through the app.</p><button class="btn ghost block" id="replayTour">Take the tour again</button></div>
     <div class="card hide" id="ownerBox"></div>
   </section>
 </div>
@@ -1201,6 +1208,62 @@ async function cloudAfterUnlock(pw){
   await cloudLoadReviews().catch(() => {}); renderAll();
 }
 document.addEventListener("click", e => { if (e.target.closest("#cloudRelog")) { e.preventDefault(); openLogin(); } });
+
+/* ---------------- QUICK TOUR ----------------
+   Offered once after someone sets up their account; can be replayed from Setup. */
+const TOUR = [
+  { tab:"profile", sel:"nav button[data-tab=profile]", title:"Start with Me 😎", text:"Add your ZIP code, skills and resume here. The more you add, the better your job matches get. It all saves by itself." },
+  { tab:"jobs", sel:"#modeSeg", title:"Jobs or volunteering", text:"Switch between paid jobs and volunteer spots. Everything else works the same in both." },
+  { tab:"jobs", sel:".toolbar", title:"Search & filters", text:"Search anything, or tap 🎛️ for filters like pay, distance and schedule." },
+  { tab:"jobs", sel:".job .pct", title:"Your match score", text:"How well a job fits your skills, age and experience. Green means a great fit." },
+  { tab:"jobs", sel:".job [data-apply]", title:"Apply in a few taps", text:"Send your resume by email or open their application, with a message written for you." },
+  { tab:"jobs", sel:"#openSwipe", title:"Swipe mode", text:"Flip through jobs one at a time: right to save ❤️, left to skip." },
+  { tab:"tracker", sel:"nav button[data-tab=tracker]", title:"Track everything", text:"See where each application stands, get follow-up reminders, plan interviews, and log shifts once you're hired." },
+  { tab:"setup", sel:"nav button[data-tab=setup]", title:"Phone alerts", text:"Set up free phone alerts and one-tap emailing here when you're ready. That's it!" },
+];
+let tourI = 0;
+function offerTour(){
+  S.profile = {...S.profile, tourSeen: true}; saveProfile();
+  openSheet(`<div style="text-align:center;padding:8px 4px 4px"><div style="font-size:54px">🗺️</div><h2 style="margin:6px 0">Want a quick tour?</h2>
+    <p class="hint" style="font-size:17px">About a minute. You can always find it later in Setup.</p>
+    <button class="btn primary block" id="tourYes" style="margin-top:12px">Show me around 🚀</button>
+    <button class="btn ghost block" id="tourNo" style="margin-top:10px">Skip, I'll explore</button></div>`);
+  $("#tourYes").addEventListener("click", () => { closeSheet(); startTour(); });
+  $("#tourNo").addEventListener("click", () => { closeSheet(); toast("No problem! The tour is in Setup any time."); });
+}
+function startTour(){ tourI = 0; if (!$("#tourLayer")) document.body.insertAdjacentHTML("beforeend", `<div id="tourLayer"><div id="tourSpot"></div><div id="tourCard" role="dialog" aria-live="polite"></div></div>`); showTourStep(); }
+function endTour(done){ const l = $("#tourLayer"); if (l) l.remove(); window.removeEventListener("resize", placeTour); if (done) { confetti(); toast("You're all set! 🎉"); } go("jobs"); }
+function showTourStep(){
+  const s = TOUR[tourI]; if (!s) return endTour(true);
+  if (S.tab !== s.tab) go(s.tab);
+  setTimeout(() => {
+    const el = $(s.sel); if (!el) { tourI++; return showTourStep(); }
+    if (!el.closest("nav")) el.scrollIntoView({ block: "center" });
+    $("#tourCard").innerHTML = `<div class="hint" style="margin-bottom:4px">${tourI + 1} of ${TOUR.length}</div><h3 style="margin:0 0 6px;font-size:21px">${esc(s.title)}</h3><p style="margin:0 0 14px;font-size:17px;line-height:1.45">${esc(s.text)}</p>
+      <div class="row" style="gap:10px;flex-wrap:nowrap"><button class="btn ghost small" id="tourSkip">Skip</button><span style="flex:1"></span>${tourI ? `<button class="btn ghost small" id="tourBack">Back</button>` : ""}<button class="btn primary" id="tourNext">${tourI === TOUR.length - 1 ? "Done 🎉" : "Next"}</button></div>`;
+    $("#tourSkip").onclick = () => endTour(false);
+    $("#tourNext").onclick = () => { tourI++; showTourStep(); };
+    if ($("#tourBack")) $("#tourBack").onclick = () => { tourI--; showTourStep(); };
+    setTimeout(placeTour, 250); window.addEventListener("resize", placeTour);
+  }, 120);
+}
+function placeTour(){
+  const s = TOUR[tourI], el = s && $(s.sel), spot = $("#tourSpot"), card = $("#tourCard"); if (!el || !spot) return;
+  const r = el.getBoundingClientRect(), pad = 8;
+  Object.assign(spot.style, { left: r.left - pad + "px", top: r.top - pad + "px", width: r.width + pad * 2 + "px", height: r.height + pad * 2 + "px" });
+  const below = r.top < innerHeight / 2, ch = card.offsetHeight;
+  card.style.top = below ? Math.min(innerHeight - ch - 16, r.bottom + pad + 14) + "px" : Math.max(16, r.top - pad - 14 - ch) + "px";
+}
+let tourOfferT = null;
+function maybeOfferTour(){
+  if (tourOfferT || S.profile.tourSeen || S.mode === "db" && !S.profileSeen) return;
+  tourOfferT = setTimeout(function tryOffer(){
+    if (S.profile.tourSeen || !unlocked) { tourOfferT = null; return; }
+    if ($("#sheetBg").classList.contains("on") || !$("#lock").classList.contains("hide")) { tourOfferT = setTimeout(tryOffer, 2500); return; }
+    tourOfferT = null; offerTour();
+  }, 1200);
+}
+$("#replayTour").addEventListener("click", startTour);
 
 /* ---------------- RECOVERY CODES ---------------- */
 function newRecoveryCode(){
@@ -2510,6 +2573,7 @@ function checkGate(){
   if (!(S.profile.pw && S.profile.pw.hash)) { hideLock(); if (!$("#pw1")) askPassword(true); return; }
   if (!unlocked) { showLock("enter"); return; }
   hideLock();
+  maybeOfferTour();
 }
 function hideLock(){ $("#lock").classList.add("hide"); }
 function showLock(mode){
@@ -2575,7 +2639,7 @@ function askPassword(required, reset){
       }
       const pw = await hashPw(a);
       S.profile = {...S.profile, pw}; await saveProfile();
-      setUnlocked(); delete $("#sheetBg").dataset.locked; closeSheet(); hideLock(); toast("Password saved 🔒");
+      setUnlocked(); delete $("#sheetBg").dataset.locked; closeSheet(); hideLock(); toast("Password saved 🔒"); if (required) maybeOfferTour();
     } catch(err){ $("#pwMsg").textContent = err && err.code ? cloudMsg(err) : "Couldn't save that. Try again."; }
   });
 }
