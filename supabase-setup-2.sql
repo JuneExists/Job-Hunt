@@ -19,7 +19,7 @@ declare h text;
 begin
   if auth.uid() is null then return false; end if;
   select value_hash into h from public.app_secrets where name = 'owner_code';
-  if h is null or extensions.crypt(upper(trim(p_code)), h) <> h then return false; end if;
+  if h is null or encode(extensions.digest(upper(trim(p_code)), 'sha256'), 'hex') <> h then return false; end if;
   insert into public.admins(user_id) values (auth.uid()) on conflict do nothing;
   return true;
 end $$;
