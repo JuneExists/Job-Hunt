@@ -37,3 +37,9 @@ drop policy if exists "reviews are public" on public.reviews;
 create policy "reviews are public" on public.reviews for select using (true);
 drop policy if exists "write my reviews" on public.reviews;
 create policy "write my reviews" on public.reviews for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+-- Let the app (signed-out visitors and signed-in people) reach these tables. The policies above still decide who can change what.
+grant usage on schema public to anon, authenticated;
+grant select on public.people, public.reviews to anon, authenticated;
+grant insert, update on public.people to authenticated;
+grant insert, update, delete on public.reviews to authenticated;

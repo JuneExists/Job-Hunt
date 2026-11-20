@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#000000">
 <title>Job Hunt</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Permanent+Marker&display=swap" rel="stylesheet">
 <style>
 :root{
   color-scheme:dark;
@@ -221,6 +221,57 @@ nav button.on .pfp-emoji{box-shadow:0 0 0 2.5px var(--cyan)}
 .credit{margin-top:14px;padding:10px 14px;border-radius:14px;background:var(--grape-soft);font-size:14px;font-weight:700;color:var(--ink)}
 .credit a{color:var(--grape)}
 .presets button.on{border-color:var(--cyan);transform:scale(1.06);box-shadow:0 0 18px rgba(34,211,238,.45)}
+
+/* ================= STICKER ZINE LOOK =================
+   Hand-cut sticker cards: thick outlines, hard offset shadows, tiny tilts, marker headings.
+   Dark background with a faint dot grid like zine paper. Everything stays big and readable. */
+:root{--outline:#2f3546;--hard:5px 5px 0 #000;--marker:"Permanent Marker",Nunito,sans-serif}
+body{background-color:#05060a;background-image:radial-gradient(rgba(140,160,220,.09) 1.1px,transparent 1.2px);background-size:18px 18px}
+#pageTitle,.lockbox h2,.empty h2,.empty h3{font-family:var(--marker);font-weight:400;letter-spacing:.5px}
+#pageTitle{font-size:30px;line-height:1.05;text-shadow:3px 3px 0 var(--brand-deep,#2b5bd1);transform:rotate(-1.5deg);display:inline-block}
+#pageTitle::after{content:" ✦";color:var(--cyan);font-size:.6em;vertical-align:super;text-shadow:none}
+.card h2,.sheet-head h2{position:relative;display:inline-block;z-index:0}
+.card h2::after,.sheet-head h2::after{content:"";position:absolute;left:-3px;right:-5px;bottom:2px;height:.42em;background:rgba(79,140,255,.28);border-radius:3px;transform:rotate(-1deg);z-index:-1}
+.card{border:2.5px solid var(--outline);border-radius:20px;box-shadow:var(--hard)}
+.card.job{border:3px solid var(--stripe,var(--outline));box-shadow:6px 6px 0 #000;transform:rotate(-.5deg);transition:transform .15s}
+.card.job:nth-of-type(even){transform:rotate(.45deg)}
+.card.job:active{transform:rotate(0) scale(.99)}
+.job::before{width:0;box-shadow:none}
+.card.job::after{content:"";position:absolute;top:-9px;left:50%;width:74px;height:18px;margin-left:-37px;background:rgba(238,242,255,.13);transform:rotate(-3deg);border-radius:2px}
+.card.job:nth-of-type(even)::after{transform:rotate(4deg);left:30%}
+.job{overflow:visible}
+.pct{border:2.5px solid var(--pfg);border-radius:50%;width:70px;height:70px;min-width:70px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0;transform:rotate(6deg);box-shadow:3px 3px 0 #000;font-size:19px}
+.pct small{font-size:9.5px;line-height:1.05;margin-top:2px;max-width:58px}
+.chip{border:2px solid currentColor;border-radius:9px;transform:rotate(-1.2deg);box-shadow:2px 2px 0 #000}
+.chip:nth-child(even){transform:rotate(1deg)}
+.btn{border:2.5px solid #000;box-shadow:4px 4px 0 #000;transition:transform .08s,box-shadow .08s}
+.btn:active{transform:translate(3px,3px);box-shadow:1px 1px 0 #000}
+.btn.ghost{border:2.5px solid var(--outline);box-shadow:4px 4px 0 #000}
+.btn.primary{box-shadow:4px 4px 0 #000}
+.btn.small{box-shadow:3px 3px 0 #000}
+.box{border:2px dashed var(--outline);border-radius:16px}
+.banner{border:2.5px solid rgba(56,189,248,.45);box-shadow:4px 4px 0 #000;border-radius:14px;transform:rotate(-.4deg)}
+.sortrow{padding:4px 2px 8px}
+.sortrow button{border:2.5px solid var(--outline);border-radius:12px;box-shadow:3px 3px 0 #000}
+.sortrow button.on{transform:rotate(-2deg);box-shadow:3px 3px 0 var(--brand)}
+.seg{border:2.5px solid var(--outline)}
+.kpi{border:2.5px solid var(--outline);box-shadow:4px 4px 0 #000}
+.kpi:nth-child(odd){transform:rotate(-1.5deg)}.kpi:nth-child(even){transform:rotate(1.5deg)}
+.kpi b{font-family:var(--marker);font-weight:400}
+.statusPick button{border-radius:10px}
+input,select,textarea{border:2.5px solid var(--outline);border-radius:12px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--cyan);box-shadow:3px 3px 0 var(--cyan)}
+.sheet{border-top:3px solid var(--outline);box-shadow:0 -6px 0 #000}
+nav{border-top:3px solid #000;box-shadow:0 -1px 0 var(--outline)}
+nav button.on{background:var(--cyan-soft);border:2.5px solid var(--cyan);box-shadow:3px 3px 0 #000;transform:rotate(-2deg)}
+.minigoal{border:2.5px solid var(--outline);box-shadow:4px 4px 0 #000;transform:rotate(.4deg)}
+.minigoal .bar{border:2px solid #000;height:14px}
+.credit{border:2.5px dashed var(--grape);transform:rotate(-1deg)}
+.scard{border:3px solid var(--outline);box-shadow:8px 8px 0 #000}
+.lockbox .btn{width:100%}
+.empty .big{transform:rotate(-8deg);display:inline-block}
+.hint .linkish{background:none;border:0;padding:0;color:var(--cyan);font:800 15px Nunito,sans-serif;cursor:pointer;text-decoration:underline dashed;text-underline-offset:4px}
+@media (prefers-reduced-motion: reduce){.card.job,.chip,.kpi,.banner,nav button.on,.sortrow button.on,#pageTitle{transform:none}}
 </style>
 </head>
 <body>
@@ -1003,9 +1054,123 @@ async function connect(){
   if (S.mode !== "db") {
     loadLocal(); S.uid = "me"; S.myName = S.profile.username || null; S.names = S.myName ? {me: S.myName} : {};
     loadLocalReviews(); S.profileSeen = true; S.namesLoaded = true; renderAll(true); checkGate();
+    cloudInit();
   }
   renderBanners();
 }
+
+/* ---------------- SHARED ACCOUNTS (Supabase) ----------------
+   Makes usernames unique for everyone and shares reviews, on any website host.
+   Fill in CLOUD with your Supabase Project URL and anon/publishable key (both are meant to be public).
+   Profiles and saved jobs stay on each phone; only usernames, sign-in and reviews are shared. */
+const CLOUD = { url: "https://ydsedkwopnhceujrphfl.supabase.co", key: "sb_publishable__UQ8RPQTaaq_225Kfw-xaA_TiQVf_Dw" };
+const cloudOn = () => S.mode !== "db" && /^https:\/\/\S+$/.test(CLOUD.url) && CLOUD.key.length > 20 && !/__CLOUD/.test(CLOUD.url + CLOUD.key);
+let sb = null, cloudUser = null;
+const cloudErr = (code, msg) => Object.assign(new Error(msg || code), {code});
+async function cloudInit(){
+  if (!cloudOn()) return;
+  try {
+    if (!window.supabase) await loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js");
+    sb = window.supabase.createClient(CLOUD.url, CLOUD.key, { auth: { persistSession: true, autoRefreshToken: true, storageKey: "jh_cloud" } });
+    const { data } = await sb.auth.getSession(); cloudUser = data && data.session ? data.session.user : null;
+    if (cloudUser) {
+      S.uid = cloudUser.id;
+      const { data: me } = await sb.from("people").select("username").eq("id", cloudUser.id).maybeSingle();
+      if (me && me.username && me.username !== S.myName) { S.myName = me.username; S.profile = {...S.profile, username: me.username}; saveProfile(); }
+    }
+    await cloudLoadReviews(); renderAll(); checkGate();
+    const u = $("#unameSave"); if (u && $("#sheetBg").dataset.locked && !$("#haveAccount") && !S.myName) { u.insertAdjacentHTML("afterend", `<button class="btn ghost block" id="haveAccount" style="margin-top:10px">🔑 I already have an account</button>`); $("#haveAccount").addEventListener("click", () => { delete $("#sheetBg").dataset.locked; closeSheet(); openLogin(); }); }
+  } catch(e){ console.error(e); sb = null; banner("Couldn't reach the shared reviews right now. Your own stuff still works."); }
+}
+async function cloudNameTaken(name){
+  const { data, error } = await sb.from("people").select("id").eq("username", name).maybeSingle();
+  if (error) throw error;
+  return !!(data && (!cloudUser || data.id !== cloudUser.id));
+}
+/* Claims a username: creates the shared account first if needed. The database rejects a taken name. */
+async function cloudClaim(name, pw){
+  if (!cloudUser) {
+    const login = "jh" + Array.from(crypto.getRandomValues(new Uint8Array(9)), b => b.toString(36).padStart(2, "0")).join("").slice(0, 16) + "@users.jobhunt.app";
+    const su = await sb.auth.signUp({ email: login, password: pw });
+    if (su.error) throw su.error;
+    cloudUser = su.data.user;
+    if (!su.data.session) { const si = await sb.auth.signInWithPassword({ email: login, password: pw }); if (si.error) throw cloudErr("confirm", "Turn off “Confirm email” in Supabase."); cloudUser = si.data.user; }
+  }
+  const r = await sb.from("people").upsert({ id: cloudUser.id, username: name, login: cloudUser.email });
+  if (r.error) throw r.error.code === "23505" ? cloudErr("taken") : r.error;
+  S.uid = cloudUser.id;
+}
+async function cloudLogIn(name, pw){
+  const { data, error } = await sb.from("people").select("login").eq("username", name).maybeSingle();
+  if (error) throw error;
+  if (!data) throw cloudErr("nouser");
+  const r = await sb.auth.signInWithPassword({ email: data.login, password: pw });
+  if (r.error) throw cloudErr("badpw");
+  cloudUser = r.data.user; S.uid = cloudUser.id;
+}
+async function cloudLoadReviews(){
+  if (!sb) return;
+  const { data: rows, error } = await sb.from("reviews").select("*").order("at", { ascending: false }).limit(5000);
+  if (error) throw error;
+  const ids = [...new Set((rows || []).map(r => r.user_id))];
+  const names = {};
+  if (ids.length) { const { data: ppl } = await sb.from("people").select("id,username").in("id", ids); (ppl || []).forEach(p => names[p.id] = p.username); }
+  if (cloudUser && S.myName) names[cloudUser.id] = S.myName;
+  const all = {}, mine = {};
+  (rows || []).forEach(r => {
+    const item = { company: r.company, stars: r.stars, text: r.text, role: r.role, status: r.status, at: +r.at, by: r.user_id };
+    (all[r.company_key] = all[r.company_key] || []).push(item);
+    if (cloudUser && r.user_id === cloudUser.id) { const { by, ...m } = item; mine[r.company_key] = m; }
+  });
+  S.reviews = all; S.names = names; if (cloudUser) S.myReviews = mine;
+}
+async function cloudWriteReviews(items){
+  if (!cloudUser) throw cloudErr("signedout");
+  const before = S.myReviews || {};
+  for (const k of Object.keys(before)) if (!items[k]) { const r = await sb.from("reviews").delete().eq("user_id", cloudUser.id).eq("company_key", k); if (r.error) throw r.error; }
+  const ups = Object.keys(items).filter(k => JSON.stringify(items[k]) !== JSON.stringify(before[k])).map(k => { const v = items[k];
+    return { user_id: cloudUser.id, company_key: k, company: String(v.company || "").slice(0, 120), stars: v.stars, text: String(v.text || "").slice(0, 600), role: String(v.role || "").slice(0, 120), status: String(v.status || "").slice(0, 30), at: v.at || Date.now() }; });
+  if (ups.length) { const r = await sb.from("reviews").upsert(ups); if (r.error) throw r.error; }
+  S.myReviews = items; await cloudLoadReviews();
+}
+function cloudMsg(e){
+  return e.code === "taken" ? "That username is taken. Pick another one!" : e.code === "nouser" ? "No account with that username." : e.code === "badpw" ? "That password doesn't match that username." : e.code === "confirm" ? "The app owner needs to turn off “Confirm email” in Supabase." : "Couldn't reach the server. Check your connection and try again.";
+}
+function openLogin(){
+  openSheet(`<div class="sheet-head"><h2>🔑 Log in</h2><button class="x" id="loginBack" aria-label="Back">←</button></div>
+    <p class="hint" style="margin-top:-4px">Use the username and password you made on another phone or browser.</p>
+    <form class="box" id="loginForm" autocomplete="on">
+      <div class="field"><label>Username</label><div class="row" style="flex-wrap:nowrap"><span style="font-size:22px;font-weight:900;color:var(--cyan)">@</span><input id="loginName" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required></div></div>
+      <div class="field"><label>Password</label><input id="loginPw" type="password" autocomplete="current-password" required></div>
+      <div class="hint" id="loginMsg" style="min-height:20px;margin-bottom:8px"></div>
+      <button class="btn primary block" type="submit">Log in</button></form>
+    <p class="hint">Your username, password and reviews come with you. Saved jobs and your profile stay on the phone where you made them. Use 💾 Backup on the Me tab to move them.</p>`);
+  $("#sheetBg").dataset.locked = "1";
+  $("#loginBack").addEventListener("click", () => { delete $("#sheetBg").dataset.locked; closeSheet(); askUsername(true); });
+  $("#loginForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const name = $("#loginName").value.trim().toLowerCase().replace(/^@/, ""), pw = $("#loginPw").value, m = $("#loginMsg");
+    m.innerHTML = `<span class="spin"></span> Logging in…`;
+    try {
+      await cloudLogIn(name, pw);
+      const h = await hashPw(pw);
+      S.myName = name; S.profile = {...S.profile, username: name, pw: h}; await saveProfile();
+      setUnlocked(); await cloudLoadReviews();
+      delete $("#sheetBg").dataset.locked; closeSheet(); hideLock(); renderAll(true); toast(`Welcome back, @${name}! 👋`);
+    } catch(err){ m.textContent = cloudMsg(err); }
+  });
+}
+/* After a correct password on this phone: make sure the shared account is signed in, or create it for older accounts. */
+async function cloudAfterUnlock(pw){
+  if (!sb || cloudUser || !S.myName) return;
+  try { await cloudLogIn(S.myName, pw); }
+  catch(e){
+    if (e.code === "nouser") { try { await cloudClaim(S.myName, pw); toast("Your username is saved for everyone ✓"); } catch(e2){ if (e2.code === "taken") { toast(`Someone already has @${S.myName}. Pick a new username!`); askUsername(true, true); } } }
+    else if (e.code === "badpw") banner(`Your password on this phone doesn't match your @${esc(S.myName)} account. <a href="#" id="cloudRelog">Log in again</a>`);
+  }
+  await cloudLoadReviews().catch(() => {}); renderAll();
+}
+document.addEventListener("click", e => { if (e.target.closest("#cloudRelog")) { e.preventDefault(); openLogin(); } });
 
 /* ---------------- BUILT-IN ENGINE (works without Claude) ---------------- */
 const US_STATES = "AL|AK|AZ|AR|CA|CO|CT|DE|DC|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY";
@@ -1703,7 +1868,8 @@ async function renderReviewSheet({company, role}){
 
 }
 async function writeMyReviews(items){
-  S.myReviews = items;
+  if (!(S.mode !== "db" && sb)) S.myReviews = items;
+  if (S.mode !== "db" && sb) { const before = S.myReviews; S.myReviews = before; await cloudWriteReviews(items); renderAll(); if (openReviewsFor) renderReviewSheet(openReviewsFor); return; }
   if (S.mode !== "db") { LS.set("jh_reviews", items); loadLocalReviews(); renderAll(); if (openReviewsFor) renderReviewSheet(openReviewsFor); return; }
   await queue(() => S.db.collection("reviews").doc(S.uid).set({items: JSON.parse(JSON.stringify(items))}));
 }
@@ -2081,7 +2247,7 @@ function renderUname(){
   $("#changePw").addEventListener("click", () => askPassword(false));
   if (S.profile.pw && S.profile.pw.hash) { el.insertAdjacentHTML("beforeend", `<button type="button" class="btn ghost block small" id="logOutBtn" style="margin-top:10px">🚪 Log out</button><div class="hint" style="margin-top:6px">You stay logged in on this device unless you log out or don't open the app for 2 days.</div>`); $("#logOutBtn").addEventListener("click", logOut); }
 }
-function askUsername(required){
+function askUsername(required, retaken){
   if ($("#unameInput")) return;
   openSheet(`<div class="sheet-head"><h2>👋 ${required ? "Welcome! Pick a username" : "Change your username"}</h2>${required ? "" : `<button class="x" data-close aria-label="Close">×</button>`}</div>
     <p class="hint" style="margin-top:-4px">This is how you show up when you rate and review companies. Your real name stays private.</p>
@@ -2089,7 +2255,10 @@ function askUsername(required){
       <div class="field"><label>Username</label><div class="row" style="flex-wrap:nowrap"><span style="font-size:22px;font-weight:900;color:var(--cyan)">@</span><input id="unameInput" maxlength="20" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="june.the.human" value="${esc(S.myName || "")}"></div></div>
       <div class="hint" id="unameMsg">3–20 characters: letters, numbers, _ and .</div>
       <button class="btn primary block" id="unameSave" style="margin-top:12px">${required ? "Let's go! 🚀" : "Save"}</button>
-    </div>`);
+    </div>
+    ${required && !retaken && sb ? `<button class="btn ghost block" id="haveAccount">🔑 I already have an account</button>` : ""}`);
+  const ha = $("#haveAccount"); if (ha) ha.addEventListener("click", () => { delete $("#sheetBg").dataset.locked; closeSheet(); openLogin(); });
+  if (retaken) $("#unameMsg").textContent = `Someone else already has @${S.myName}. Pick a new one!`;
   if (required) { $("#sheetBg").dataset.locked = "1"; }
   const inp = $("#unameInput");
   inp.addEventListener("input", () => { inp.value = inp.value.toLowerCase().replace(/[^a-z0-9_.]/g, ""); const ok = UNAME_RE.test(inp.value); $("#unameMsg").textContent = ok ? "Looks good!" : "3–20 characters: letters, numbers, _ and ."; });
@@ -2099,6 +2268,10 @@ function askUsername(required){
     if (name === S.myName) { delete $("#sheetBg").dataset.locked; closeSheet(); return; }
     const b = $("#unameSave"); b.disabled = true; $("#unameMsg").innerHTML = `<span class="spin"></span> Checking…`;
     try {
+      if (S.mode !== "db" && sb) {
+        if (await cloudNameTaken(name)) { $("#unameMsg").textContent = `@${name} is taken. Try another!`; b.disabled = false; return; }
+        if (cloudUser) await cloudClaim(name);
+      }
       if (S.mode === "db") {
         const taken = await S.db.collection("people").where("username", "==", name).limit(1).get();
         if (taken.docs.some(d => d.id !== S.uid)) { $("#unameMsg").textContent = `@${name} is taken. Try another!`; b.disabled = false; return; }
@@ -2107,7 +2280,7 @@ function askUsername(required){
       S.profile = {...S.profile, username: name}; await saveProfile();
       S.myName = name; S.names[S.uid] = name;
       delete $("#sheetBg").dataset.locked; closeSheet(); renderAll(); toast(`Hi @${name}! 👋`); setTimeout(checkGate, 400);
-    } catch(e){ $("#unameMsg").textContent = "Couldn't save that. Try again."; b.disabled = false; }
+    } catch(e){ $("#unameMsg").textContent = e.code ? cloudMsg(e) : "Couldn't save that. Try again."; b.disabled = false; }
   });
 }
 
@@ -2126,7 +2299,7 @@ let unlocked = false;
 try { const last = Number(localStorage.getItem("jh_lastSeen") || 0); unlocked = localStorage.getItem("jh_unlocked") === "1" && Date.now() - last < STAY_MS; if (!unlocked) localStorage.removeItem("jh_unlocked"); } catch(e){}
 function touchSeen(){ if (unlocked) try { localStorage.setItem("jh_lastSeen", String(Date.now())); } catch(e){} }
 function setUnlocked(){ unlocked = true; try { localStorage.setItem("jh_unlocked", "1"); } catch(e){} touchSeen(); }
-function logOut(){ unlocked = false; try { localStorage.removeItem("jh_unlocked"); localStorage.removeItem("jh_lastSeen"); sessionStorage.removeItem("jh_unlocked"); } catch(e){} closeSheet && closeSheet(); window.scrollTo(0,0); checkGate(); toast("Logged out 👋"); }
+function logOut(){ if (sb) { sb.auth.signOut().catch(() => {}); cloudUser = null; } unlocked = false; try { localStorage.removeItem("jh_unlocked"); localStorage.removeItem("jh_lastSeen"); sessionStorage.removeItem("jh_unlocked"); } catch(e){} closeSheet && closeSheet(); window.scrollTo(0,0); checkGate(); toast("Logged out 👋"); }
 touchSeen();
 document.addEventListener("visibilitychange", () => { if (document.visibilityState !== "visible") { touchSeen(); return; }
   try { if (unlocked && Date.now() - Number(localStorage.getItem("jh_lastSeen") || 0) >= STAY_MS) { unlocked = false; localStorage.removeItem("jh_unlocked"); checkGate(); return; } } catch(e){}
@@ -2158,7 +2331,7 @@ function showLock(mode){
     const pw = $("#unlockPw").value; $("#unlockMsg").innerHTML = `<span class="spin"></span>`;
     try {
       const h = await hashPw(pw, S.profile.pw.salt);
-      if (h.hash === S.profile.pw.hash) { setUnlocked(); hideLock(); toast("Unlocked 🔓"); }
+      if (h.hash === S.profile.pw.hash) { setUnlocked(); hideLock(); toast("Unlocked 🔓"); cloudAfterUnlock(pw); }
       else { $("#unlockMsg").textContent = "That's not it. Try again!"; $("#unlockPw").value = ""; $("#unlockPw").focus(); }
     } catch(err){ $("#unlockMsg").textContent = "Couldn't check that here. Try again."; }
   });
@@ -2189,10 +2362,14 @@ function askPassword(required, reset){
     if (a !== b) { $("#pwMsg").textContent = "Those don't match. Try again."; return; }
     $("#pwMsg").innerHTML = `<span class="spin"></span> Saving…`;
     try {
+      if (S.mode !== "db" && sb && S.myName) {
+        if (!cloudUser) { try { await cloudClaim(S.myName, a); } catch(err){ if (err.code === "taken") { $("#pwMsg").textContent = ""; delete $("#sheetBg").dataset.locked; closeSheet(); askUsername(true, true); return; } throw err; } }
+        else { const r = await sb.auth.updateUser({ password: a }); if (r.error) throw r.error; }
+      }
       const pw = await hashPw(a);
       S.profile = {...S.profile, pw}; await saveProfile();
       setUnlocked(); delete $("#sheetBg").dataset.locked; closeSheet(); hideLock(); toast("Password saved 🔒");
-    } catch(err){ $("#pwMsg").textContent = "Couldn't save that. Try again."; }
+    } catch(err){ $("#pwMsg").textContent = err && err.code ? cloudMsg(err) : "Couldn't save that. Try again."; }
   });
 }
 
