@@ -1,6 +1,7 @@
 """Generates local job leads for every state: city, schools, hospitals, transit, flagship university, state government.
 These are real kinds of employers that exist in each place; pay is a typical national starting range."""
 import json, urllib.parse
+from hospitals import H
 
 # state: (name, [(city, lat, lon), ...], (university, city, lat, lon))
 S = {
@@ -122,7 +123,12 @@ def make(t, st, place, lat, lon, fmt):
 out = []
 for st, (name, cities, (u, ucity, ulat, ulon)) in S.items():
     for (c, lat, lon) in cities:
-        for t in CITY + CITY2: out.append(make(t, st, c, lat, lon, {"c": c}))
+        h = H.get(st, {}).get(c)
+        for t in CITY + CITY2:
+            if "Hospitals in {c}" in t[1]:
+                if not h: continue   # no hospital of its own; skip rather than make up a name
+                t = t[:1] + ("{h}",) + t[2:12] + (t[12].replace("hospitals in {c}", "{h}").replace("hospitals around {c}", "{h}").replace("Hospitals in {c}", "{h}"),)
+            out.append(make(t, st, c, lat, lon, {"c": c, "h": h}))
     for t in UNIV: out.append(make(t, st, ucity, ulat, ulon, {"u": u}))
     for t in STATE: out.append(make(t, st, "", None, None, {"n": name}))
 lib = json.load(open("jobs-library.json"))
