@@ -272,6 +272,32 @@ nav button.on{background:var(--cyan-soft);border:2.5px solid var(--cyan);box-sha
 .empty .big{transform:rotate(-8deg);display:inline-block}
 .hint .linkish{background:none;border:0;padding:0;color:var(--cyan);font:800 15px Nunito,sans-serif;cursor:pointer;text-decoration:underline dashed;text-underline-offset:4px}
 @media (prefers-reduced-motion: reduce){.card.job,.chip,.kpi,.banner,nav button.on,.sortrow button.on,#pageTitle{transform:none}}
+
+/* ================= STICKY NOTES =================
+   Job cards are post-it notes in deep cool tints with a peeled corner; small buttons are mini notes. */
+:root{--n1:#1c2c4f;--n2:#163a33;--n3:#2c2250;--n4:#103a45;--fold:rgba(255,255,255,.2)}
+.note,.card.job,.sortrow button,.btn.ghost,.kpi{--note:var(--n1)}
+.card.job:nth-of-type(4n+2),.sortrow button:nth-child(4n+2),.btn.ghost:nth-of-type(4n+2),.kpi:nth-child(4n+2){--note:var(--n2)}
+.card.job:nth-of-type(4n+3),.sortrow button:nth-child(4n+3),.btn.ghost:nth-of-type(4n+3),.kpi:nth-child(4n+3){--note:var(--n3)}
+.card.job:nth-of-type(4n+4),.sortrow button:nth-child(4n+4),.btn.ghost:nth-of-type(4n+4),.kpi:nth-child(4n+4){--note:var(--n4)}
+/* paper with a folded-up bottom-right corner */
+.card.job,.sortrow button,.btn.ghost,.kpi{
+  background:linear-gradient(135deg,var(--fold) 0 50%,transparent 50%) bottom right/var(--fs,26px) var(--fs,26px) no-repeat,
+             linear-gradient(315deg,transparent calc(var(--fs,26px) * .7),var(--note) calc(var(--fs,26px) * .7));
+  border:0}
+.card.job{--fs:34px;border-radius:3px;border-top:7px solid var(--stripe,var(--outline));padding-top:20px;
+  box-shadow:0 18px 16px -14px rgba(0,0,0,.95),3px 4px 0 rgba(0,0,0,.55)}
+.card.job::after{display:none}
+.card.job .comp{color:rgba(238,242,255,.72)}
+.card.job .hint{color:rgba(238,242,255,.66)}
+.card.job .chip{box-shadow:none;background-color:rgba(0,0,0,.28)}
+.sortrow button{--fs:14px;border-radius:3px;box-shadow:2px 3px 0 rgba(0,0,0,.7);color:var(--ink)}
+.sortrow button.on{background:linear-gradient(135deg,rgba(255,255,255,.35) 0 50%,transparent 50%) bottom right/14px 14px no-repeat,linear-gradient(315deg,transparent 10px,var(--ink) 10px);color:#000;box-shadow:2px 3px 0 var(--brand)}
+.btn.ghost{--fs:16px;border-radius:4px;box-shadow:3px 4px 0 rgba(0,0,0,.75)}
+.btn.ghost:active{box-shadow:1px 1px 0 rgba(0,0,0,.75)}
+.kpi{--fs:16px;border-radius:3px;box-shadow:3px 4px 0 rgba(0,0,0,.75)}
+.minigoal{border-radius:4px}
+@media (prefers-reduced-motion: reduce){.sortrow button.on{transform:none}}
 </style>
 </head>
 <body>
@@ -497,6 +523,7 @@ nav button.on{background:var(--cyan-soft);border:2.5px solid var(--cyan);box-sha
         <p style="margin:6px 0">Drag this to your bookmarks bar: <a class="bm" id="bookmarklet" href="#">⚡ Autofill</a></p></details>
       <p class="hint">Changed your profile? Copy the code again and update the bookmark.</p>
     </div>
+    <div class="card hide" id="ownerBox"></div>
   </section>
 </div>
 
@@ -977,6 +1004,7 @@ function queue(fn){ writing = writing.then(fn).catch(e => { console.error(e); to
 async function saveProfile(){
   if (S.mode === "db") await queue(() => profileRef().set(JSON.parse(JSON.stringify(S.profile))));
   else if (!LS.set("jh_profile", S.profile)) { toast("Couldn't save on this device. Is Private Browsing on? Turn it off, or save a backup."); return false; }
+  try { vaultSoon(); } catch(e){}
   return true;
 }
 async function saveJob(job){
@@ -984,7 +1012,7 @@ async function saveJob(job){
   if (i >= 0) S.jobs[i] = job; else S.jobs.push(job);
   renderAll();
   if (S.mode === "db") { const body = JSON.parse(JSON.stringify(job)); await queue(() => jobsCol().doc(job.id).set(body)); }
-  else LS.set("jh_jobs", S.jobs);
+  else { LS.set("jh_jobs", S.jobs); try { vaultSoon(); } catch(e){} }
 }
 function allJobs(){
   const own = new Set(S.jobs.map(j => j.id)), hidden = new Set(S.profile.hiddenLib || []);
@@ -1002,7 +1030,7 @@ async function deleteJob(id){
   S.jobs = S.jobs.filter(j => j.id !== id);
   renderAll();
   if (S.mode === "db") await queue(() => jobsCol().doc(id).delete());
-  else LS.set("jh_jobs", S.jobs);
+  else { LS.set("jh_jobs", S.jobs); try { vaultSoon(); } catch(e){} }
 }
 
 async function connect(){
@@ -1078,7 +1106,8 @@ async function cloudInit(){
       const { data: me } = await sb.from("people").select("username").eq("id", cloudUser.id).maybeSingle();
       if (me && me.username && me.username !== S.myName) { S.myName = me.username; S.profile = {...S.profile, username: me.username}; saveProfile(); }
     }
-    await cloudLoadReviews(); renderAll(); checkGate();
+    await cloudLoadReviews(); await loadSpots(); renderAll(); checkGate();
+    if (cloudUser) { vaultPull().catch(() => {}); checkAdmin(); }
     const u = $("#unameSave"); if (u && $("#sheetBg").dataset.locked && !$("#haveAccount") && !S.myName) { u.insertAdjacentHTML("afterend", `<button class="btn ghost block" id="haveAccount" style="margin-top:10px">🔑 I already have an account</button>`); $("#haveAccount").addEventListener("click", () => { delete $("#sheetBg").dataset.locked; closeSheet(); openLogin(); }); }
   } catch(e){ console.error(e); sb = null; banner("Couldn't reach the shared reviews right now. Your own stuff still works."); }
 }
@@ -1112,6 +1141,8 @@ async function cloudLoadReviews(){
   if (!sb) return;
   const { data: rows, error } = await sb.from("reviews").select("*").order("at", { ascending: false }).limit(5000);
   if (error) throw error;
+  const { data: hid } = await sb.from("hidden_reviews").select("review_user,company_key").limit(5000);
+  S.hidden = new Set((hid || []).map(h => h.review_user + "|" + h.company_key)); S.hiddenReviews = {};
   const ids = [...new Set((rows || []).map(r => r.user_id))];
   const names = {};
   if (ids.length) { const { data: ppl } = await sb.from("people").select("id,username").in("id", ids); (ppl || []).forEach(p => names[p.id] = p.username); }
@@ -1119,7 +1150,8 @@ async function cloudLoadReviews(){
   const all = {}, mine = {};
   (rows || []).forEach(r => {
     const item = { company: r.company, stars: r.stars, text: r.text, role: r.role, status: r.status, at: +r.at, by: r.user_id };
-    (all[r.company_key] = all[r.company_key] || []).push(item);
+    if (S.hidden.has(r.user_id + "|" + r.company_key)) S.hiddenReviews[r.user_id + "|" + r.company_key] = item;
+    else (all[r.company_key] = all[r.company_key] || []).push(item);
     if (cloudUser && r.user_id === cloudUser.id) { const { by, ...m } = item; mine[r.company_key] = m; }
   });
   S.reviews = all; S.names = names; if (cloudUser) S.myReviews = mine;
@@ -1143,10 +1175,12 @@ function openLogin(){
       <div class="field"><label>Username</label><div class="row" style="flex-wrap:nowrap"><span style="font-size:22px;font-weight:900;color:var(--cyan)">@</span><input id="loginName" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required></div></div>
       <div class="field"><label>Password</label><input id="loginPw" type="password" autocomplete="current-password" required></div>
       <div class="hint" id="loginMsg" style="min-height:20px;margin-bottom:8px"></div>
-      <button class="btn primary block" type="submit">Log in</button></form>
+      <button class="btn primary block" type="submit">Log in</button>
+      <button class="btn ghost block small" type="button" id="loginForgot" style="margin-top:10px">Forgot your password?</button></form>
     <p class="hint">Your username, password and reviews come with you. Saved jobs and your profile stay on the phone where you made them. Use 💾 Backup on the Me tab to move them.</p>`);
   $("#sheetBg").dataset.locked = "1";
   $("#loginBack").addEventListener("click", () => { delete $("#sheetBg").dataset.locked; closeSheet(); askUsername(true); });
+  $("#loginForgot").addEventListener("click", () => { delete $("#sheetBg").dataset.locked; closeSheet(); openRecover(); });
   $("#loginForm").addEventListener("submit", async e => {
     e.preventDefault();
     const name = $("#loginName").value.trim().toLowerCase().replace(/^@/, ""), pw = $("#loginPw").value, m = $("#loginMsg");
@@ -1155,7 +1189,7 @@ function openLogin(){
       await cloudLogIn(name, pw);
       const h = await hashPw(pw);
       S.myName = name; S.profile = {...S.profile, username: name, pw: h}; await saveProfile();
-      setUnlocked(); await cloudLoadReviews();
+      setUnlocked(); await vaultPull(); await cloudLoadReviews(); await loadSpots(); checkAdmin();
       delete $("#sheetBg").dataset.locked; closeSheet(); hideLock(); renderAll(true); toast(`Welcome back, @${name}! 👋`);
     } catch(err){ m.textContent = cloudMsg(err); }
   });
@@ -1163,14 +1197,168 @@ function openLogin(){
 /* After a correct password on this phone: make sure the shared account is signed in, or create it for older accounts. */
 async function cloudAfterUnlock(pw){
   if (!sb || cloudUser || !S.myName) return;
-  try { await cloudLogIn(S.myName, pw); }
+  try { await cloudLogIn(S.myName, pw); vaultPull().catch(() => {}); checkAdmin(); }
   catch(e){
-    if (e.code === "nouser") { try { await cloudClaim(S.myName, pw); toast("Your username is saved for everyone ✓"); } catch(e2){ if (e2.code === "taken") { toast(`Someone already has @${S.myName}. Pick a new username!`); askUsername(true, true); } } }
+    if (e.code === "nouser") { try { await cloudClaim(S.myName, pw); toast("Your username is saved for everyone ✓"); vaultSoon(); checkAdmin(); setTimeout(makeRecoveryCode, 900); } catch(e2){ if (e2.code === "taken") { toast(`Someone already has @${S.myName}. Pick a new username!`); askUsername(true, true); } } }
     else if (e.code === "badpw") banner(`Your password on this phone doesn't match your @${esc(S.myName)} account. <a href="#" id="cloudRelog">Log in again</a>`);
   }
   await cloudLoadReviews().catch(() => {}); renderAll();
 }
 document.addEventListener("click", e => { if (e.target.closest("#cloudRelog")) { e.preventDefault(); openLogin(); } });
+
+/* ---------------- RECOVERY CODES ---------------- */
+function newRecoveryCode(){
+  const A = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789", b = crypto.getRandomValues(new Uint8Array(16));
+  return Array.from(b, x => A[x % A.length]).join("").match(/.{4}/g).join("-");
+}
+async function makeRecoveryCode(){
+  if (!sb || !cloudUser) return;
+  const code = newRecoveryCode();
+  const { data, error } = await sb.rpc("set_recovery", { p_code: code });
+  if (error || data !== true) { toast("Couldn't make a recovery code right now."); return; }
+  S.profile = {...S.profile, recoveryAt: Date.now()}; saveProfile();
+  openSheet(`<div class="sheet-head"><h2>🧯 Your recovery code</h2></div>
+    <p class="hint" style="margin-top:-4px">If you ever forget your password, this code lets you set a new one. Save it somewhere safe, like a screenshot or your notes app. It's only shown this once.</p>
+    <div class="box" style="text-align:center;background:var(--sun-soft)"><div style="font:900 24px ui-monospace,Menlo,monospace;letter-spacing:2px;color:var(--ink);word-break:break-all" id="rcCode">${esc(code)}</div>
+      <button class="btn ghost small" id="rcCopy" style="margin-top:10px">📋 Copy it</button></div>
+    <label class="row" style="font-weight:800;margin:6px 0 12px"><input type="checkbox" id="rcSaved"> I saved it somewhere safe</label>
+    <button class="btn primary block" id="rcDone" disabled>Done</button>`);
+  $("#sheetBg").dataset.locked = "1";
+  $("#rcCopy").addEventListener("click", async () => { try { await navigator.clipboard.writeText(code); toast("Copied 📋"); } catch(e){ toast("Press and hold the code to copy it."); } });
+  $("#rcSaved").addEventListener("change", e => { $("#rcDone").disabled = !e.target.checked; });
+  $("#rcDone").addEventListener("click", () => { delete $("#sheetBg").dataset.locked; closeSheet(); renderAll(); });
+}
+function openRecover(){
+  openSheet(`<div class="sheet-head"><h2>🧯 Reset with recovery code</h2><button class="x" id="rvBack" aria-label="Back">←</button></div>
+    <p class="hint" style="margin-top:-4px">Use the code you saved when you made your account.</p>
+    <form class="box" id="recoverForm">
+      <div class="field"><label>Username</label><div class="row" style="flex-wrap:nowrap"><span style="font-size:22px;font-weight:900;color:var(--cyan)">@</span><input id="rcName" autocapitalize="none" spellcheck="false" value="${esc(S.myName || "")}" required></div></div>
+      <div class="field"><label>Recovery code</label><input id="rcIn" autocapitalize="characters" spellcheck="false" placeholder="ABCD-EFGH-JKLM-NPQR" required></div>
+      <div class="field"><label>New password</label><input id="rcPw" type="password" autocomplete="new-password" minlength="6" required></div>
+      <div class="hint" id="rcMsg" style="min-height:20px;margin-bottom:8px"></div>
+      <button class="btn primary block" type="submit">Set new password</button></form>`);
+  $("#sheetBg").dataset.locked = "1";
+  $("#rvBack").addEventListener("click", () => { delete $("#sheetBg").dataset.locked; closeSheet(); if (S.profile.pw && S.profile.pw.hash) showLock("enter"); else askUsername(true); });
+  $("#recoverForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const name = $("#rcName").value.trim().toLowerCase().replace(/^@/, ""), code = $("#rcIn").value.trim().toUpperCase(), pw = $("#rcPw").value, m = $("#rcMsg");
+    if (pw.length < 6) { m.textContent = "Use at least 6 characters."; return; }
+    m.innerHTML = `<span class="spin"></span> Checking…`;
+    try {
+      const { data, error } = await sb.rpc("reset_password", { p_username: name, p_code: code, p_new: pw });
+      if (error) throw error;
+      if (data !== "ok") { m.textContent = ({nouser:"No account with that username.", nocode:"That account doesn't have a recovery code.", badcode:"That code doesn't match. Check it and try again.", locked:"Too many wrong tries. This code is locked.", short:"Use at least 6 characters."})[data] || "Couldn't reset it."; return; }
+      await cloudLogIn(name, pw);
+      S.myName = name; S.profile = {...S.profile, username: name, pw: await hashPw(pw)}; await saveProfile();
+      setUnlocked(); await vaultPull(); await cloudLoadReviews(); await loadSpots(); checkAdmin();
+      delete $("#sheetBg").dataset.locked; closeSheet(); hideLock(); renderAll(true);
+      toast("New password set 🔓"); setTimeout(makeRecoveryCode, 600);
+    } catch(err){ m.textContent = err.code ? cloudMsg(err) : "Couldn't reach the server. Try again."; }
+  });
+}
+
+/* ---------------- PRIVATE SYNC ---------------- */
+let vaultT = null;
+function vaultSoon(){ if (!sb || !cloudUser) return; clearTimeout(vaultT); vaultT = setTimeout(vaultPush, 2000); }
+async function vaultPush(){
+  if (!sb || !cloudUser) return;
+  const { pw, ...profile } = S.profile, at = Date.now();
+  const r = await sb.from("vault").upsert({ user_id: cloudUser.id, profile, jobs: S.jobs, updated_at: at });
+  if (!r.error) LS.set("jh_synced", at);
+}
+async function vaultPull(){
+  if (!sb || !cloudUser) return;
+  const { data: row } = await sb.from("vault").select("*").eq("user_id", cloudUser.id).maybeSingle();
+  const last = +LS.get("jh_synced") || 0;
+  if (row && +row.updated_at > last) {
+    const local = S.jobs, remote = Array.isArray(row.jobs) ? row.jobs : [];
+    const ids = new Set(remote.map(j => j.id));
+    S.jobs = remote.concat(last ? [] : local.filter(j => !ids.has(j.id)));
+    S.profile = {...DEFAULT_PROFILE, ...(last ? {} : S.profile), ...row.profile, pw: S.profile.pw, username: S.myName || row.profile.username};
+    LS.set("jh_profile", S.profile); LS.set("jh_jobs", S.jobs); LS.set("jh_synced", +row.updated_at);
+    pfDirty = false; renderAll(true);
+    if (!last && local.length) vaultSoon();
+  } else if (!row || +row.updated_at < last || !last) vaultSoon();
+}
+
+/* ---------------- REPORTS + MODERATION ---------------- */
+S.hidden = new Set(); S.cloudAdmin = false;
+function openReport(by, key){
+  if (!sb || !cloudUser) { toast("Log in to report a review."); return; }
+  const reasons = ["Rude or hateful", "Fake or spam", "Shares someone's private info", "Not about this company", "Something else"];
+  openSheet(`<div class="sheet-head"><h2>🚩 Report this review</h2><button class="x" data-close aria-label="Close">×</button></div>
+    <p class="hint" style="margin-top:-4px">What's wrong with it? The app owner will take a look.</p>
+    <div class="box" id="rpReasons">${reasons.map(r => `<button class="btn ghost block small" data-reason="${esc(r)}" style="margin-bottom:8px">${esc(r)}</button>`).join("")}</div>`);
+  $("#rpReasons").addEventListener("click", async e => {
+    const b = e.target.closest("[data-reason]"); if (!b) return;
+    const r = await sb.from("reports").insert({ review_user: by, company_key: key, reason: b.dataset.reason });
+    closeSheet(); toast(!r.error || r.error.code === "23505" ? "Thanks, reported 🚩" : "Couldn't send that. Try again.");
+  });
+}
+async function checkAdmin(){
+  if (!sb || !cloudUser) { S.cloudAdmin = false; return; }
+  const { data } = await sb.rpc("is_admin"); S.cloudAdmin = data === true; renderOwner();
+}
+async function renderOwner(){
+  const el = $("#ownerBox"); if (!el) return;
+  if (!sb || !cloudUser) { el.innerHTML = ""; el.classList.add("hide"); return; }
+  el.classList.remove("hide");
+  if (!S.cloudAdmin) {
+    el.innerHTML = `<details><summary>🛡️ App owner tools</summary><p class="hint">Only for the person who runs this app. Enter your private owner code once.</p>
+      <div class="row"><input id="ownerCode" autocapitalize="characters" spellcheck="false" placeholder="Owner code" style="flex:1;min-width:160px"><button class="btn primary small" id="ownerGo">Unlock</button></div><div class="hint" id="ownerMsg"></div></details>`;
+    $("#ownerGo").addEventListener("click", async () => {
+      const { data } = await sb.rpc("claim_admin", { p_code: $("#ownerCode").value }); if (data === true) { toast("You're the app owner 🛡️"); checkAdmin(); } else $("#ownerMsg").textContent = "That code didn't work.";
+    });
+    return;
+  }
+  const { data: reps } = await sb.from("reports").select("*").order("at", { ascending: false }).limit(200);
+  const groups = {};
+  (reps || []).forEach(r => { const k = r.review_user + "|" + r.company_key; (groups[k] = groups[k] || { by: r.review_user, key: r.company_key, reasons: [] }).reasons.push(r.reason); });
+  const list = Object.values(groups);
+  const find = g => (S.reviews[g.key] || []).find(x => x.by === g.by) || (S.hiddenReviews || {})[g.by + "|" + g.key];
+  el.innerHTML = `<h2>🛡️ Reported reviews</h2>${list.length ? list.map(g => { const r = find(g) || {}; const hid = S.hidden.has(g.by + "|" + g.key);
+      return `<div class="box"><div class="row" style="justify-content:space-between"><b>${esc(r.company || g.key)}</b>${r.stars ? starsHtml(r.stars) : ""}</div>
+        <p style="margin:6px 0">${r.text ? esc(r.text) : `<span class="hint">(no text)</span>`}</p>
+        <div class="hint">By ${S.names[g.by] ? "@" + esc(S.names[g.by]) : "someone"} · ${g.reasons.length} report${g.reasons.length === 1 ? "" : "s"}: ${esc([...new Set(g.reasons)].join(", "))}${hid ? " · <b>hidden</b>" : ""}</div>
+        <div class="duo" style="margin-top:10px"><button class="btn coral small" data-mod="hide" data-by="${esc(g.by)}" data-key="${esc(g.key)}">${hid ? "Keep hidden" : "🙈 Hide it"}</button><button class="btn ghost small" data-mod="keep" data-by="${esc(g.by)}" data-key="${esc(g.key)}">${hid ? "Show it again" : "It's fine"}</button></div></div>`; }).join("")
+    : `<p class="hint">No reports right now. 🎉</p>`}`;
+  el.onclick = async e => {
+    const b = e.target.closest("[data-mod]"); if (!b) return;
+    const by = b.dataset.by, key = b.dataset.key;
+    if (b.dataset.mod === "hide") await sb.from("hidden_reviews").upsert({ review_user: by, company_key: key });
+    else await sb.from("hidden_reviews").delete().eq("review_user", by).eq("company_key", key);
+    await sb.from("reports").delete().eq("review_user", by).eq("company_key", key);
+    toast(b.dataset.mod === "hide" ? "Hidden 🙈" : "Done ✓"); await cloudLoadReviews(); renderAll(); renderOwner();
+  };
+}
+
+/* ---------------- HIRING NOW ---------------- */
+S.spots = {};
+function spotKey(j){
+  const place = j.location || (j.remote ? "remote" : [S.profile.city, S.profile.state].filter(Boolean).join(", "));
+  return (ckey(j.company) + "|" + norm(place)).slice(0, 200);
+}
+async function loadSpots(){
+  if (!sb) return;
+  const since = new Date(Date.now() - 21 * 86400e3).toISOString();
+  const { data } = await sb.from("hiring_spots").select("spot_key,user_id,at").gte("at", since).limit(5000);
+  const m = {};
+  (data || []).forEach(s => { const t = Date.parse(s.at); const v = m[s.spot_key] = m[s.spot_key] || { n: 0, last: 0, mine: false }; v.n++; v.last = Math.max(v.last, t); if (cloudUser && s.user_id === cloudUser.id) v.mine = true; });
+  S.spots = m;
+}
+const spotOf = j => S.spots[spotKey(j)];
+function spotChip(j){
+  const s = spotOf(j); if (!s) return "";
+  const d = Math.floor((Date.now() - s.last) / 86400e3);
+  return `<span class="chip" style="background:var(--mint-soft);color:var(--mint)">🟢 Hiring now · ${d <= 0 ? "spotted today" : d === 1 ? "spotted yesterday" : `spotted ${d} days ago`}${s.n > 1 ? ` (${s.n})` : ""}</span>`;
+}
+async function toggleSpot(j){
+  if (!sb || !cloudUser) { toast("Log in to share that they're hiring."); return; }
+  const s = spotOf(j), key = spotKey(j);
+  if (s && s.mine) await sb.from("hiring_spots").delete().eq("user_id", cloudUser.id).eq("spot_key", key);
+  else await sb.from("hiring_spots").upsert({ user_id: cloudUser.id, spot_key: key, company: String(j.company).slice(0, 120), place: String(j.location || [S.profile.city, S.profile.state].filter(Boolean).join(", ")).slice(0, 80), at: new Date().toISOString() });
+  await loadSpots(); renderJobs(); toast(s && s.mine ? "Removed your hiring tag" : "Thanks! Everyone nearby can see they're hiring 🟢");
+}
 
 /* ---------------- BUILT-IN ENGINE (works without Claude) ---------------- */
 const US_STATES = "AL|AK|AZ|AR|CA|CO|CT|DE|DC|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY";
@@ -1563,7 +1751,7 @@ function openFilters(){
 }
 $("#openFilters").addEventListener("click", openFilters);
 $("#fSearch").addEventListener("input", e => { S.F.q = e.target.value; renderJobs(); });
-$("#catRow").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; if (b.dataset.teen) { S.F.teen = !S.F.teen; saveFilters(); renderJobs(); return; } if (b.dataset.agefit) { S.F.ageFit = !S.F.ageFit; saveFilters(); renderJobs(); return; } if (b.dataset.saved) { S.F.saved = !S.F.saved; saveFilters(); renderJobs(); return; } if (b.dataset.small) { S.F.small = !S.F.small; saveFilters(); renderJobs(); return; } S.F.cat = b.dataset.cat; saveFilters(); renderJobs(); });
+$("#catRow").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; if (b.dataset.teen) { S.F.teen = !S.F.teen; saveFilters(); renderJobs(); return; } if (b.dataset.agefit) { S.F.ageFit = !S.F.ageFit; saveFilters(); renderJobs(); return; } if (b.dataset.saved) { S.F.saved = !S.F.saved; saveFilters(); renderJobs(); return; } if (b.dataset.hiring) { S.F.hiring = !S.F.hiring; saveFilters(); renderJobs(); return; } if (b.dataset.small) { S.F.small = !S.F.small; saveFilters(); renderJobs(); return; } S.F.cat = b.dataset.cat; saveFilters(); renderJobs(); });
 $("#catHint").addEventListener("click", e => { if (e.target.closest("#sortCats")) sortIntoCats(); });
 async function sortIntoCats(){
   const todo = S.jobs.filter(j => !CAT[j.category]); if (!todo.length) return;
@@ -1584,8 +1772,8 @@ function renderJobs(){
   $$("#sortRow button").forEach(b => b.classList.toggle("on", b.dataset.sort === F.sort));
   const catCounts = {}; allJobs().filter(j => !j.status).forEach(j => { if (CAT[j.category]) catCounts[j.category] = (catCounts[j.category]||0) + 1; });
   const teenN = allJobs().filter(j => !j.status && teenOk(j)).length;
-  const nSaved = (S.profile.saved || []).length, age = myAge();
-  $("#catRow").innerHTML = (age != null ? `<button data-agefit="1" class="${F.ageFit ? "on" : ""}" style="${F.ageFit ? "background:var(--grape);border-color:var(--grape);color:#0d0520" : ""}">🎂 Old enough at ${age}</button>` : "") + (nSaved ? `<button data-saved="1" class="${F.saved ? "on" : ""}" style="${F.saved ? "background:var(--coral);border-color:var(--coral);color:#1a0006" : ""}">❤️ Saved <span style="opacity:.6">${nSaved}</span></button>` : "") + `<button data-teen="1" class="${F.teen ? "on" : ""}" style="${F.teen ? "background:var(--mint);border-color:var(--mint);color:#00140c" : ""}">🎒 Teens${teenN ? ` <span style="opacity:.6">${teenN}</span>` : ""}</button><button data-small="1" class="${F.small ? "on" : ""}" style="${F.small ? "background:var(--sun);border-color:var(--sun);color:#1f1400" : ""}">🏪 Small biz <span style="opacity:.6">${allJobs().filter(j => j.smallBiz && !j.status).length}</span></button><button data-cat="all" class="${F.cat === "all" ? "on" : ""}">🌈 All kinds</button>` + CATS.map(([id,i,n]) => `<button data-cat="${id}" class="${F.cat === id ? "on" : ""}">${i} ${n}${catCounts[id] ? ` <span style="opacity:.6">${catCounts[id]}</span>` : ""}</button>`).join("");
+  const nSaved = (S.profile.saved || []).length, age = myAge(), nHiring = Object.keys(S.spots || {}).length ? allJobs().filter(j => !j.status && spotOf(j)).length : 0;
+  $("#catRow").innerHTML = (age != null ? `<button data-agefit="1" class="${F.ageFit ? "on" : ""}" style="${F.ageFit ? "background:var(--grape);border-color:var(--grape);color:#0d0520" : ""}">🎂 Old enough at ${age}</button>` : "") + (nHiring ? `<button data-hiring="1" class="${F.hiring ? "on" : ""}" style="${F.hiring ? "background:var(--mint);border-color:var(--mint);color:#00140c" : ""}">🟢 Hiring now <span style="opacity:.6">${nHiring}</span></button>` : "") + (nSaved ? `<button data-saved="1" class="${F.saved ? "on" : ""}" style="${F.saved ? "background:var(--coral);border-color:var(--coral);color:#1a0006" : ""}">❤️ Saved <span style="opacity:.6">${nSaved}</span></button>` : "") + `<button data-teen="1" class="${F.teen ? "on" : ""}" style="${F.teen ? "background:var(--mint);border-color:var(--mint);color:#00140c" : ""}">🎒 Teens${teenN ? ` <span style="opacity:.6">${teenN}</span>` : ""}</button><button data-small="1" class="${F.small ? "on" : ""}" style="${F.small ? "background:var(--sun);border-color:var(--sun);color:#1f1400" : ""}">🏪 Small biz <span style="opacity:.6">${allJobs().filter(j => j.smallBiz && !j.status).length}</span></button><button data-cat="all" class="${F.cat === "all" ? "on" : ""}">🌈 All kinds</button>` + CATS.map(([id,i,n]) => `<button data-cat="${id}" class="${F.cat === id ? "on" : ""}">${i} ${n}${catCounts[id] ? ` <span style="opacity:.6">${catCounts[id]}</span>` : ""}</button>`).join("");
   const unsorted = S.jobs.filter(j => !CAT[j.category]).length;
   $("#catHint").innerHTML = (F.teen ? `<div class="banner" style="background:var(--mint-soft);border-color:rgba(52,211,153,.3)">🎒 <b>Jobs for teens:</b> little or no experience needed, best-rated first. Always check the minimum age and your state's rules for working hours.</div>` : "") + (unsorted ? `<div class="banner info row" style="justify-content:space-between">${unsorted} job${unsorted>1?"s":""} not sorted by kind yet<button class="btn small grape" id="sortCats">✨ Sort them</button></div>` : "");
   const fc = filterCount(); $("#filterCount").textContent = fc; $("#filterCount").classList.toggle("hide", !fc);
@@ -1598,6 +1786,7 @@ function renderJobs(){
     if (F.teen && !teenOk(j)) return false;
     if (F.ageFit && !ageOk(j)) return false;
     if (F.saved && !isSaved(j)) return false;
+    if (F.hiring && !spotOf(j)) return false;
     if (F.small && !j.smallBiz) return false;
     if (F.fit && !fitsSchedule(j)) return false;
     if (q && !norm([j.title, j.company, j.location, (j.skills||[]).join(" ")].join(" ")).includes(q)) return false;
@@ -1619,7 +1808,7 @@ function renderJobs(){
     if (F.sort === "rating") return ((b.r && b.r.avg) || 0) - ((a.r && a.r.avg) || 0) || b.m.score - a.m.score;
     if (F.sort === "new") return (b.j.addedAt || 0) - (a.j.addedAt || 0);
     if (F.sort === "age") return ((needAge(a.j) ?? 14) - (needAge(b.j) ?? 14)) || b.m.score - a.m.score;
-    return b.m.score - a.m.score;
+    return (spotOf(b.j) ? 15 : 0) + b.m.score - (spotOf(a.j) ? 15 : 0) - a.m.score;
   });
   S.lastRows = rows; renderMiniGoal();
   $("#resultCount").textContent = total ? (rows.length === total ? `${total} jobs` : `Showing ${rows.length} of ${total} jobs`) + (myState() && !F.allStates ? ` · regional picks for ${STATE_NAME[myState()] || myState()}` : "") : "";
@@ -1644,9 +1833,9 @@ function renderJobs(){
       <div class="facts"><span>${where}</span>${p ? `<span>💵 ${esc(p)}${j.starter || j.library ? " <span class=\"hint\">typical</span>" : ""}</span>` : ""}<span>🕒 ${esc(TYPE_NAME[j.type] || "")}</span></div>
       <div class="facts" style="margin-top:0">${d != null ? `<a href="${esc(dirLink(j,"driving"))}" target="_blank" rel="noopener">🚗 ~${driveMins(d)} min</a><a href="${esc(dirLink(j,"transit"))}" target="_blank" rel="noopener">🚌 Transit</a>` : ""}${j.applyUrl ? `<a href="${esc(j.applyUrl)}" target="_blank" rel="noopener">🌐 Hiring page</a>` : (j.starter || j.library) ? `<a href="${esc(indeedLink(j))}" target="_blank" rel="noopener">🔎 Find openings</a>` : ""}${yearGross(j) ? `<button class="linkish" data-pay="${esc(j.id)}">💸 ≈${$$$(takeHome(yearGross(j)).net/52)}/wk take-home</button>` : ""}${goalChip(j)}${j.applyEmail ? `<span>📧 ${esc(j.applyEmail)}</span>` : ""}${j.phone ? `<a href="tel:${esc(j.phone.replace(/[^\d+]/g, ""))}">📞 ${esc(j.phone)}</a>` : ""}</div>
       ${(j.scam || []).length ? `<button class="btn small block" data-scam="${esc(j.id)}" style="background:var(--coral-soft);color:var(--coral);margin:4px 0 6px">🚩 Possible scam: tap to see why</button>` : ""}
-      <div>${j.starter ? `<span class="chip" style="background:var(--mint-soft);color:var(--mint)">🌱 Starter lead</span>` : ""}${j.named ? `<span class="chip" style="background:var(--sun-soft);color:var(--sun)">🏪 Local small business</span>` : j.smallBiz ? `<span class="chip" style="background:var(--sun-soft);color:var(--sun)">🏪 Small business</span>` : j.library ? `<span class="chip" style="background:var(--sky-soft);color:var(--sky)">📚 Job library</span>` : ""}${teenOk(j) ? `<span class="chip" style="background:var(--mint-soft);color:var(--mint)">🎒 ${j.minAge ? esc(j.minAge) + "+" : "Teen-friendly"}</span>` : ""}${CAT[j.category] ? `<span class="chip cat">${CAT[j.category].i} ${CAT[j.category].n}</span>` : ""}${chips}</div>${perks ? `<div style="margin-top:4px">${perks}</div>` : ""}
+      <div>${spotChip(j)}${j.starter ? `<span class="chip" style="background:var(--mint-soft);color:var(--mint)">🌱 Starter lead</span>` : ""}${j.named ? `<span class="chip" style="background:var(--sun-soft);color:var(--sun)">🏪 Local small business</span>` : j.smallBiz ? `<span class="chip" style="background:var(--sun-soft);color:var(--sun)">🏪 Small business</span>` : j.library ? `<span class="chip" style="background:var(--sky-soft);color:var(--sky)">📚 Job library</span>` : ""}${teenOk(j) ? `<span class="chip" style="background:var(--mint-soft);color:var(--mint)">🎒 ${j.minAge ? esc(j.minAge) + "+" : "Teen-friendly"}</span>` : ""}${CAT[j.category] ? `<span class="chip cat">${CAT[j.category].i} ${CAT[j.category].n}</span>` : ""}${chips}</div>${perks ? `<div style="margin-top:4px">${perks}</div>` : ""}
       ${j.summary ? `<div class="hint" style="margin-top:8px">${esc(j.summary)}</div>` : ""}
-      <div class="hint" style="margin-top:6px"><button class="linkish" data-share="${esc(j.id)}">📤 Share this job</button></div>
+      <div class="hint" style="margin-top:6px;display:flex;gap:16px;flex-wrap:wrap"><button class="linkish" data-share="${esc(j.id)}">📤 Share this job</button>${sb && !j.remote ? `<button class="linkish" data-spot="${esc(j.id)}">${(spotOf(j) || {}).mine ? "✓ You said they're hiring" : "🟢 I saw they're hiring"}</button>` : ""}</div>
       <div class="jbtns">
         ${j.status ? `<span class="status st-${esc(j.status)}" style="display:grid;place-items:center">${ST[j.status] ? ST[j.status].i : ""} ${esc(j.status)}</span>` : `<button class="btn primary" data-apply="${esc(j.id)}">🚀 Apply</button>`}
         <button class="btn ghost small" data-reviews="${esc(j.id)}" style="min-height:52px">${r ? `⭐ ${r.avg.toFixed(1)} <span class="hint">(${r.n})</span>` : "⭐ Reviews"}</button>
@@ -1662,6 +1851,7 @@ $("#jobList").addEventListener("click", e => {
   const ed = e.target.closest("[data-edit]"); if (ed) editJob(ed.dataset.edit);
   const py = e.target.closest("[data-pay]"); if (py) openPay(py.dataset.pay);
   const sh = e.target.closest("[data-share]"); if (sh) openShare(sh.dataset.share);
+  const sp = e.target.closest("[data-spot]"); if (sp) { const j = findJob(sp.dataset.spot); if (j) toggleSpot(j); return; }
   const ht = e.target.closest("[data-heart]"); if (ht) { const j = findJob(ht.dataset.heart); if (j) { const on = !isSaved(j); toggleSaved(j, on).then(() => { renderJobs(); toast(on ? "Saved ❤️" : "Removed from saved"); }); } return; }
   const sc = e.target.closest("[data-scam]"); if (sc) openScam(sc.dataset.scam);
 });
@@ -1831,11 +2021,11 @@ async function renderReviewSheet({company, role}){
   const draft = wasOpen && $("#rvText") ? { text: $("#rvText").value, stars: +($("#rvStars") && $("#rvStars").dataset.v || 0) } : null;
   const html = `
     <div class="sheet-head"><h2>⭐ ${esc(company)}</h2><button class="x" data-close aria-label="Close">×</button></div>
-    <p class="hint" style="margin-top:-4px">${S.mode === "db" ? "How it went for people who applied here" : "Your rating, saved on this device"}</p>
+    <p class="hint" style="margin-top:-4px">${S.mode === "db" || sb ? "How it went for people who applied here" : "Your rating, saved on this device"}</p>
     <div class="box">${r ? `<div class="avg"><b>${r.avg.toFixed(1)}</b><div>${starsHtml(r.avg)}<div class="hint">${r.n} review${r.n === 1 ? "" : "s"}</div></div></div>` : `<div class="empty" style="padding:10px"><div class="big">🌟</div><b>No reviews yet</b></div>`}
       <div id="rvList">${list.map(x => `<div class="review"><div class="rhead"><span><span>${x.by === S.uid ? "You" : S.names[x.by] ? "@" + esc(S.names[x.by]) : "Someone"}</span>${x.status ? ` <span class="status st-${esc(x.status)}" style="padding:2px 8px;font-size:12px">${esc(x.status)}</span>` : ""}</span>${starsHtml(x.stars)}</div>
         ${x.role ? `<div class="hint">Applied for ${esc(x.role)}</div>` : ""}${x.text ? `<div style="margin-top:4px;white-space:pre-wrap">${esc(x.text)}</div>` : ""}
-        <div class="row" style="justify-content:space-between"><span class="hint">${x.at ? new Date(x.at).toLocaleDateString() : ""}</span>${S.isOwner && x.by !== S.uid ? `<button class="btn ghost small" data-remove="${esc(x.by)}" style="min-height:34px;padding:4px 10px">Remove</button>` : ""}</div></div>`).join("")}</div></div>
+        <div class="row" style="justify-content:space-between"><span class="hint">${x.at ? new Date(x.at).toLocaleDateString() : ""}</span>${S.isOwner && x.by !== S.uid ? `<button class="btn ghost small" data-remove="${esc(x.by)}" style="min-height:34px;padding:4px 10px">Remove</button>` : ""}${sb && x.by !== S.uid ? `<button class="btn ghost small" data-report="${esc(x.by)}" style="min-height:34px;padding:4px 10px" aria-label="Report this review">🚩 Report</button>` : ""}</div></div>`).join("")}</div></div>
     ${canWrite ? `<div class="box" style="background:var(--grape-soft)"><h3>${mine ? "✏️ Your review" : "🗣️ Leave a review"}</h3>
         <p class="hint" style="margin-top:0">How was applying to ${esc(company)}? Did they reply, was the interview fair, were they friendly?</p>
         <div class="starpick" id="rvStars" data-v="${draft ? draft.stars : (mine ? mine.stars : 0)}">${[1,2,3,4,5].map(i => `<button type="button" data-s="${i}" aria-label="${i} star${i>1?"s":""}">★</button>`).join("")}</div>
@@ -1861,6 +2051,7 @@ async function renderReviewSheet({company, role}){
     const del = $("#rvDel");
     if (del) del.addEventListener("click", async () => { const m = {...S.myReviews}; delete m[key]; try { await writeMyReviews(m); toast("Review deleted"); } catch(e){ toast("Couldn't delete. Try again."); } });
   }
+  $$("[data-report]").forEach(b => b.addEventListener("click", () => openReport(b.dataset.report, key)));
   $$("[data-remove]").forEach(b => b.addEventListener("click", async () => {
     try { const ref = S.db.collection("reviews").doc(b.dataset.remove); const snap = await ref.get(); if (!snap.exists) return;
       const items = {...(snap.data().items || {})}; delete items[key]; await queue(() => ref.set({items})); toast("Removed"); } catch(e){ toast("Couldn't remove it."); }
@@ -2245,6 +2436,7 @@ function renderUname(){
   $("#changeUname").addEventListener("click", () => askUsername(false));
   el.insertAdjacentHTML("beforeend", `<button type="button" class="btn ghost block small" id="changePw" style="margin-top:10px">🔒 Change my password</button>`);
   $("#changePw").addEventListener("click", () => askPassword(false));
+  if (sb && cloudUser) { el.insertAdjacentHTML("beforeend", `<button type="button" class="btn ghost block small" id="newRecovery" style="margin-top:10px">🧯 Make a new recovery code</button>`); $("#newRecovery").addEventListener("click", makeRecoveryCode); }
   if (S.profile.pw && S.profile.pw.hash) { el.insertAdjacentHTML("beforeend", `<button type="button" class="btn ghost block small" id="logOutBtn" style="margin-top:10px">🚪 Log out</button><div class="hint" style="margin-top:6px">You stay logged in on this device unless you log out or don't open the app for 2 days.</div>`); $("#logOutBtn").addEventListener("click", logOut); }
 }
 const UNAME_EXAMPLES = ["sunny.side", "pixel.pal", "night.owl", "coffee.cat", "star.seeker", "lucky.duck", "cloud.nine", "go.getter"];
@@ -2300,7 +2492,7 @@ let unlocked = false;
 try { const last = Number(localStorage.getItem("jh_lastSeen") || 0); unlocked = localStorage.getItem("jh_unlocked") === "1" && Date.now() - last < STAY_MS; if (!unlocked) localStorage.removeItem("jh_unlocked"); } catch(e){}
 function touchSeen(){ if (unlocked) try { localStorage.setItem("jh_lastSeen", String(Date.now())); } catch(e){} }
 function setUnlocked(){ unlocked = true; try { localStorage.setItem("jh_unlocked", "1"); } catch(e){} touchSeen(); }
-function logOut(){ if (sb) { sb.auth.signOut().catch(() => {}); cloudUser = null; } unlocked = false; try { localStorage.removeItem("jh_unlocked"); localStorage.removeItem("jh_lastSeen"); sessionStorage.removeItem("jh_unlocked"); } catch(e){} closeSheet && closeSheet(); window.scrollTo(0,0); checkGate(); toast("Logged out 👋"); }
+function logOut(){ if (sb) { clearTimeout(vaultT); if (cloudUser) vaultPush().catch(() => {}).finally(() => sb.auth.signOut().catch(() => {})); else sb.auth.signOut().catch(() => {}); cloudUser = null; S.cloudAdmin = false; } unlocked = false; try { localStorage.removeItem("jh_unlocked"); localStorage.removeItem("jh_lastSeen"); sessionStorage.removeItem("jh_unlocked"); } catch(e){} closeSheet && closeSheet(); window.scrollTo(0,0); checkGate(); toast("Logged out 👋"); }
 touchSeen();
 document.addEventListener("visibilitychange", () => { if (document.visibilityState !== "visible") { touchSeen(); return; }
   try { if (unlocked && Date.now() - Number(localStorage.getItem("jh_lastSeen") || 0) >= STAY_MS) { unlocked = false; localStorage.removeItem("jh_unlocked"); checkGate(); return; } } catch(e){}
@@ -2337,13 +2529,22 @@ function showLock(mode){
     } catch(err){ $("#unlockMsg").textContent = "Couldn't check that here. Try again."; }
   });
   $("#forgotPw").addEventListener("click", () => {
+    if (sb && S.mode !== "db" && S.myName) { box.innerHTML = `<h2>🔑 Forgot your password?</h2><p class="hint">Use the recovery code you saved when you made your account.</p>
+      <button class="btn primary block" id="useCode">🧯 Use my recovery code</button><button class="btn ghost block small" id="noCode" style="margin-top:8px">I don't have it</button><button class="btn ghost block small" id="backLock2" style="margin-top:8px">Back</button>`;
+      $("#useCode").addEventListener("click", () => { hideLock(); openRecover(); });
+      $("#backLock2").addEventListener("click", () => showLock("enter"));
+      $("#noCode").addEventListener("click", () => { box.innerHTML = ""; showWipe(); });
+      return; }
+    showWipe();
+  });
+  function showWipe(){
     box.innerHTML = S.mode === "db" ? `<h2>🔑 Reset your password</h2><p class="hint">You're signed in with your own Claude account, so you can set a new password right here.</p>
       <button class="btn primary block" id="doReset">Set a new password</button>` : `<h2>🔑 Forgot your password?</h2><p class="hint">Your Job Hunt data lives only on this device, and the password protects it, so there's no way to recover it. You can start over: this erases everything saved here (your jobs, profile and reviews). If you made a backup file, you can load it afterward.</p>
       <button class="btn coral block" id="doWipe">Erase and start over</button><button class="btn ghost block small" id="backLock" style="margin-top:8px">Back</button>`;
     const dr = $("#doReset"); if (dr) dr.addEventListener("click", () => { hideLock(); askPassword(true, true); });
     const dw = $("#doWipe"); if (dw) dw.addEventListener("click", () => { if (dw.dataset.sure !== "1") { dw.dataset.sure = "1"; dw.textContent = "Tap again to erase everything"; return; } try { ["jh_profile","jh_jobs","jh_reviews","jh_unlocked"].forEach(k => localStorage.removeItem(k)); sessionStorage.clear(); } catch(e){} location.reload(); });
     $("#backLock").addEventListener("click", () => showLock("enter"));
-  });
+  }
 }
 function askPassword(required, reset){
   openSheet(`<div class="sheet-head"><h2>🔒 ${reset ? "New password" : required ? "Create a password" : "Change password"}</h2>${required ? "" : `<button class="x" data-close aria-label="Close">×</button>`}</div>
@@ -2364,7 +2565,7 @@ function askPassword(required, reset){
     $("#pwMsg").innerHTML = `<span class="spin"></span> Saving…`;
     try {
       if (S.mode !== "db" && sb && S.myName) {
-        if (!cloudUser) { try { await cloudClaim(S.myName, a); } catch(err){ if (err.code === "taken") { $("#pwMsg").textContent = ""; delete $("#sheetBg").dataset.locked; closeSheet(); askUsername(true, true); return; } throw err; } }
+        if (!cloudUser) { try { await cloudClaim(S.myName, a); setTimeout(makeRecoveryCode, 700); vaultSoon(); checkAdmin(); } catch(err){ if (err.code === "taken") { $("#pwMsg").textContent = ""; delete $("#sheetBg").dataset.locked; closeSheet(); askUsername(true, true); return; } throw err; } }
         else { const r = await sb.auth.updateUser({ password: a }); if (r.error) throw r.error; }
       }
       const pw = await hashPw(a);
