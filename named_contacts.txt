@@ -1,0 +1,6 @@
+# Business|City|email|phone  (only from the business's own site or listings; checked Nov 2026)
+Weller Book Works|Salt Lake City|books@wellerbookworks.com|(801) 328-2586
+The King's English Bookshop|Salt Lake City|books@kingsenglish.com|(801) 484-9100
+Ken Sanders Rare Books|Salt Lake City|books@kensandersbooks.com|(801) 521-3819
+Caputo's Market & Deli|Salt Lake City|careers@caputos.com|
+Central Book Exchange|Salt Lake City||(801) 485-3913

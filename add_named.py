@@ -18,6 +18,10 @@ R={"books":("Bookseller","creative",13,17,16,"Reading;Customer service;Organizat
  "bbq":("Counter & Kitchen Crew","hands-on",13,17,16,"Food prep;Customer service;Teamwork","F;B;E","local barbecue restaurant"),
  "gifts":("Sales Associate","people",12,16,16,"Customer service;Gift wrapping;Cash handling","F;E","local gift shop"),
  "tourist":("Seasonal Team Member","outdoors",13,16,15,"Customer service;Cash handling;Teamwork","F;E","famous local attraction")}
+C={}
+for line in open('named_contacts.txt'):
+    if line.strip() and not line.startswith('#'):
+        b,c,e,ph=[x.strip() for x in line.rstrip('\n').split('|')]; C[(b,c)]=(e,ph)
 out=[];seen=set()
 for line in open('library_named.txt'):
     line=line.strip()
@@ -31,9 +35,12 @@ for line in open('library_named.txt'):
       "skills":skills.split(';'),"benefits":[B[b] for b in bens.split(';')],
       "summary":f"{biz} is a {kind} in {city}. Ask about openings, or check their website and social media for hiring posts.",
       "remote":False,"states":[st],"location":f"{city}, {st}","lat":lat,"lon":lon})
+    e,ph=C.get((biz,city),("",""))
+    if e: out[-1]["applyEmail"]=e; out[-1]["domain"]=e.split("@")[1]
+    if ph: out[-1]["phone"]=ph
 L=[j for j in json.load(open('jobs-library.json')) if not j['id'].startswith('nb')]
 for i,j in enumerate(out,1): j['id']=f"nb{i:03d}"
 base=[j for j in L if not j['id'].startswith('loc')]; loc=[j for j in L if j['id'].startswith('loc')]
 json.dump(base+out+loc,open('jobs-library.json','w'),separators=(',',':'))
 c=Counter(j['states'][0] for j in out)
-print("named:",len(out),"states:",len(c),"min/state:",min(c.values()),"| total:",len(base+out+loc))
+print("with email:",sum(1 for j in out if j.get("applyEmail")),"| named:",len(out),"states:",len(c),"min/state:",min(c.values()),"| total:",len(base+out+loc))
