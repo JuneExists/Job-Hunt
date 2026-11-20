@@ -30,6 +30,31 @@ out.append(vol("vol-peace-corps", "Peace Corps Volunteer (stipend)", "Peace Corp
   "Live and work abroad for about 2 years in education, health or farming. Living costs are covered, with a payment when you finish.",
   ty="temporary", bens="H", remote=True, findUrl=gsearch("Peace Corps apply")))
 
+
+# ---- more remote / from home ----
+for id_, title, comp, cat, age, skills, summ in [
+  ("vol-be-my-eyes", "Video Helper (on your phone)", "Be My Eyes", "care", 17, ["Communication", "Patience", "Friendly"], "Answer short video calls from blind and low-vision people who need a quick pair of eyes, like reading a label. Help whenever your phone rings."),
+  ("vol-7cups", "Volunteer Listener", "7 Cups", "care", 18, ["Active listening", "Compassion", "Typing"], "Give free, anonymous emotional support by text chat after a short online training."),
+  ("vol-librivox", "Audiobook Reader", "LibriVox", "creative", 13, ["Reading", "Public speaking", "Computers"], "Record yourself reading chapters of public-domain books so anyone can listen free."),
+  ("vol-learning-ally", "Volunteer Reader & Reviewer", "Learning Ally", "brainy", 18, ["Reading", "Attention to detail"], "Help make audiobooks for students with dyslexia and other reading differences."),
+  ("vol-familysearch", "Record Indexing Volunteer", "FamilySearch", "brainy", 12, ["Typing", "Attention to detail", "Reading"], "Type up names and dates from old records so families can find their ancestors. Any amount of time, from home."),
+  ("vol-hot", "Mapping Volunteer", "Humanitarian OpenStreetMap Team", "brainy", 13, ["Computers", "Attention to detail"], "Trace roads and buildings on satellite photos to help disaster responders. Training is built in."),
+  ("vol-wikipedia", "Wikipedia Editor", "Wikimedia Foundation", "brainy", 13, ["Writing", "Research", "Attention to detail"], "Improve Wikipedia articles on topics you know, like art, music or your hometown."),
+  ("vol-catchafire", "Skills-Based Volunteer", "Catchafire", "creative", 18, ["Graphic design", "Writing", "Social media", "Canva"], "Use your skills (design, writing, social media) on short projects for nonprofits. Great for building a portfolio."),
+  ("vol-unv-online", "Online Volunteer", "UN Volunteers", "brainy", 18, ["Writing", "Research", "Graphic design", "Translation"], "Help United Nations partners online with design, writing, research and translation tasks."),
+  ("vol-twb", "Volunteer Translator", "Translators without Borders (CLEAR Global)", "brainy", 18, ["Spanish", "Bilingual", "Writing"], "Translate health and crisis information for people in other languages. Needs strong skills in two languages."),
+]:
+    out.append(vol(id_, title, comp, cat, age, skills, summ, remote=True, findUrl=gsearch(f"{comp} volunteer")))
+out.append(vol("vol-experience-corps", "Reading Tutor (ages 50+)", "AARP Foundation Experience Corps", "care", 50, ["Tutoring", "Patience", "Reading", "Teaching"],
+  "Volunteers 50 and older help young kids learn to read in local schools. Some cities offer a small stipend.", findUrl=gsearch("AARP Foundation Experience Corps volunteer"), remote=True))
+out.append(vol("vol-foodcorps", "FoodCorps Service Member (stipend)", "FoodCorps", "outdoors", 18, ["Teaching", "Gardening", "Cooking", "Childcare"],
+  "A year of service teaching kids about healthy food and school gardens, for a living stipend and education award.", ty="temporary", bens="T", remote=True, findUrl=gsearch("FoodCorps apply")))
+out.append(vol("vol-ace", "Conservation Corps Member (stipend)", "American Conservation Experience", "outdoors", 18, ["Outdoor work", "Teamwork", "Tools", "Hiking"],
+  "Build trails and restore public lands in crews across the West, with a living stipend.", ty="temporary", bens="T", remote=True, findUrl=gsearch("American Conservation Experience apply")))
+out.append(vol("vol-ucc", "Utah Conservation Corps Member (stipend)", "Utah Conservation Corps (USU)", "outdoors", 18, ["Outdoor work", "Teamwork", "Tools"],
+  "Seasonal crews doing trail, habitat and fire-fuel work across Utah, with a living stipend and education award.", ty="temporary", bens="T",
+  states=["UT"], location="Logan, UT", lat=41.74, lon=-111.81, findUrl=gsearch("Utah Conservation Corps apply")))
+
 # ---- Salt Lake City favorites ----
 SLC = dict(states=["UT"], location="Salt Lake City, UT")
 out.append(vol("vol-ut-food-bank", "Warehouse Volunteer", "Utah Food Bank", "hands-on", 8, ["Teamwork", "Packing & shipping", "Lifting"],
@@ -42,6 +67,20 @@ out.append(vol("vol-ut-primary-childrens", "Hospital Volunteer", "Intermountain 
   "Play with kids, help families and support staff at Utah's children's hospital.", lat=40.77, lon=-111.84, findUrl=gsearch("Primary Children's Hospital volunteer"), **SLC))
 out.append(vol("vol-ut-voa", "Volunteer", "Volunteers of America, Utah", "people", 16, ["Compassion", "Cooking", "Teamwork"],
   "Serve meals and help at youth and family programs in Salt Lake City.", lat=40.75, lon=-111.90, findUrl=gsearch("Volunteers of America Utah volunteer"), **SLC))
+
+
+for id_, title, comp, cat, age, skills, summ, lat, lon in [
+  ("vol-ut-humane", "Animal Care Volunteer", "Humane Society of Utah", "care", 16, ["Animals", "Pet care", "Cleaning"], "Walk dogs, socialize cats and help with adoptions in Murray.", 40.66, -111.90),
+  ("vol-ut-slcpl", "Library Volunteer", "Salt Lake City Public Library", "brainy", 14, ["Organization", "Reading", "Customer service"], "Shelve books, help at events and support kids' programs at the Main Library and branches.", 40.76, -111.88),
+  ("vol-ut-aviary", "Volunteer", "Tracy Aviary", "outdoors", 16, ["Animals", "Public speaking", "Outdoor work"], "Help with birds, gardens and education programs at Liberty Park.", 40.74, -111.87),
+  ("vol-ut-red-butte", "Garden Volunteer", "Red Butte Garden", "outdoors", 16, ["Gardening", "Outdoor work", "Teamwork"], "Plant, weed and help at concerts and events in the University of Utah's botanical garden.", 40.77, -111.82),
+  ("vol-ut-hogle", "Zoo Volunteer", "Utah's Hogle Zoo", "outdoors", 16, ["Animals", "Public speaking", "Customer service"], "Talk with guests, help at animal encounters and support education programs.", 40.75, -111.81),
+  ("vol-ut-nhmu", "Museum Volunteer", "Natural History Museum of Utah", "brainy", 16, ["Public speaking", "Science", "Customer service"], "Help guests explore exhibits and assist with hands-on activities and collections.", 40.76, -111.82),
+  ("vol-ut-road-home", "Shelter Volunteer", "The Road Home", "people", 16, ["Compassion", "Cooking", "Teamwork"], "Serve meals and help at family and community shelters in Salt Lake County.", 40.75, -111.90),
+  ("vol-ut-ccs", "Dining Hall Volunteer", "Catholic Community Services of Utah", "people", 14, ["Cooking", "Teamwork", "Compassion"], "Serve meals at the St. Vincent de Paul Dining Hall and help in the food pantry.", 40.75, -111.91),
+  ("vol-ut-irc", "Refugee Family Mentor", "International Rescue Committee - Salt Lake City", "care", 18, ["Compassion", "Communication", "Bilingual"], "Help newly arrived refugee families learn the city, practice English and get settled.", 40.72, -111.89),
+]:
+    out.append(vol(id_, title, comp, cat, age, skills, summ, lat=lat, lon=lon, findUrl=gsearch(f"{comp} volunteer"), **SLC))
 
 # ---- every city ----
 for st, (name, cities, uni) in S.items():
@@ -61,6 +100,20 @@ for st, (name, cities, uni) in S.items():
           f"Spend a few hours a month as a mentor to a kid around {c}. Matched by interests.", findUrl=gsearch(f"Big Brothers Big Sisters volunteer {c} {st}"), **base))
         out.append(vol(f"vol-{k}-bgc", "Club Volunteer", "Boys & Girls Clubs of America", "care", 16, ["Childcare", "Tutoring", "Sports"],
           f"Help with homework, games and sports at a Boys & Girls Club around {c}.", findUrl=gsearch(f"Boys & Girls Club volunteer {c} {st}"), **base))
+        stname = S[st][0]
+        out.append(vol(f"vol-{k}-salvation", "Volunteer", "The Salvation Army", "people", 14, ["Customer service", "Compassion", "Teamwork"],
+          f"Ring bells at the holidays, sort donations or help at the food pantry around {c}.", findUrl=gsearch(f"Salvation Army volunteer {c} {st}"), **base))
+        out.append(vol(f"vol-{k}-specialoly", "Coach or Event Volunteer", f"Special Olympics {stname}", "care", 15, ["Sports", "Coaching", "Patience", "Friendly"],
+          f"Coach athletes with intellectual disabilities or help at games and events around {c}.", findUrl=gsearch(f"Special Olympics {stname} volunteer {c}"), **base))
+        out.append(vol(f"vol-{k}-ymca", "Program Volunteer", "YMCA", "care", 14, ["Childcare", "Sports", "Friendly"],
+          f"Help with youth sports, camps and community programs at a Y around {c}.", findUrl=gsearch(f"YMCA volunteer {c} {st}"), **base))
+        out.append(vol(f"vol-{k}-ja", "Classroom Volunteer", "Junior Achievement", "brainy", 18, ["Teaching", "Public speaking", "Communication"],
+          f"Teach short, ready-made lessons about money and careers to students around {c}. Everything is provided.", findUrl=gsearch(f"Junior Achievement volunteer {c} {st}"), **base))
+        out.append(vol(f"vol-{k}-girlscouts", "Troop Leader or Event Volunteer", "Girl Scouts", "care", 18, ["Childcare", "Leadership", "Crafts"],
+          f"Lead a troop or help at camps and events for girls around {c}.", findUrl=gsearch(f"Girl Scouts volunteer {c} {st}"), **base))
+        out.append(vol(f"vol-{k}-casa", "Court Appointed Special Advocate (CASA)", "CASA for Children", "care", 21, ["Compassion", "Communication", "Writing"],
+          f"Get trained to speak up in court for a child in foster care around {c}. About 10 to 15 hours a month.", findUrl=gsearch(f"CASA volunteer {c} {st}"), **base))
+
 
 L = [j for j in json.load(open("jobs-library.json")) if not j["id"].startswith("vol")]
 for j in L:   # stipend service programs already in the starter list move into the volunteer section

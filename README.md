@@ -8,7 +8,7 @@ Art for the profile pictures by **June Whitaker** · [@june.the.human](https://w
 
 | File | What it is |
 | --- | --- |
-| `index.html` | The whole app, including the built-in library of 9,062 jobs and volunteer spots |
+| `index.html` | The whole app, including the built-in library of 10,321 jobs and volunteer spots |
 | `presets/` | The 20 profile pictures |
 | `jobs-library.json` | The job library as a separate file, in case you want to edit it |
 | `Code.gs` | Optional Google script for one-tap emailing and reply alerts |
