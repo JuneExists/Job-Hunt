@@ -10,7 +10,7 @@ src = open("gen_local.py").read()
 ns = {}
 exec(src[:src.index("CITY = [")], ns)          # loads the city table S and hospital names H without generating anything
 S, H = ns["S"], ns["H"]
-B = {"H":"Health insurance","D":"Dental","V":"Vision","R":"Retirement (401k)","P":"Paid time off","F":"Flexible schedule","T":"Tuition help","E":"Employee discount","B":"Bonus / tips"}
+B = {"H":"Health insurance","D":"Dental","V":"Vision","R":"401(k) / retirement","P":"Paid time off","F":"Flexible schedule","T":"Tuition help","E":"Employee discount","B":"Bonus / tips"}
 slug = lambda s: re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
 gsearch = lambda q: "https://www.google.com/search?q=" + urllib.parse.quote(q)
 

@@ -8,7 +8,7 @@ Art for the profile pictures by **June Whitaker** · [@june.the.human](https://w
 
 | File | What it is |
 | --- | --- |
-| `index.html` | The whole app, including the built-in library of 10,321 jobs and volunteer spots |
+| `index.html` | The whole app, including the built-in library of about 110,900 jobs and volunteer spots |
 | `presets/` | The 20 profile pictures |
 | `jobs-library.json` | The job library as a separate file, in case you want to edit it |
 | `Code.gs` | Optional Google script for one-tap emailing and reply alerts |
@@ -55,3 +55,7 @@ Each person who wants this sets up their own copy.
 There are also 398 named local businesses (indie bookstores, coffee shops, bakeries, ice cream shops, record stores and family restaurants) across all 50 states and DC, shown to people in that state with distances. Businesses can close or change, so each one links to a search for current openings. The 58 small-business jobs (coffee shops, bakeries, bookstores, studios, salons and more) show for everyone, with a "Find openings" search near their ZIP code.
 
 Pay ranges in the library are typical starting ranges and change over time. The app labels them "typical" and links to live openings.
+
+
+## How jobs load
+Jobs are split into small per-state files in `jobs/` (made by `split_library.py`): `US.json` for national and remote jobs, `XX.json` for each state, and `towns-XX.json`, a tiny list of 2,016 towns (10,000+ people). The app turns each town into about 50 jobs at real local employers (city, schools, library, county, post office and big chains), so 100,000+ jobs load as a few hundred KB for your state. Town and county data comes from the plotly/datasets and kelvins/US-Cities-Database projects on GitHub.
