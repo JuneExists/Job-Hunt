@@ -305,6 +305,7 @@ nav button.on{background:var(--cyan-soft);border:2.5px solid var(--cyan);box-sha
       <button data-sort="dist">📍 Closest</button>
       <button data-sort="pay">💵 Top pay</button>
       <button data-sort="rating">⭐ Top rated</button>
+      <button data-sort="hiring">🟢 Hiring</button>
       <button data-sort="new">🆕 Newest</button>
       <button data-sort="age">🎂 Youngest age</button>
     </div>
@@ -1222,7 +1223,7 @@ async function cloudInit(){
       const { data: me } = await sb.from("people").select("username").eq("id", cloudUser.id).maybeSingle();
       if (me && me.username && me.username !== S.myName) { S.myName = me.username; S.profile = {...S.profile, username: me.username}; saveProfile(); }
     }
-    await cloudLoadReviews(); await loadSpots(); renderAll(); checkGate();
+    await cloudLoadReviews(); await loadSpots(); renderAll(); checkGate(); loadLive();
     if (cloudUser) { vaultPull().catch(() => {}); checkAdmin(); } else renderOwner();
     renderBanners();
     const u = $("#unameSave"); if (u && $("#sheetBg").dataset.locked && !$("#haveAccount") && !S.myName) { u.insertAdjacentHTML("afterend", `<button class="btn ghost block" id="haveAccount" style="margin-top:10px">🔑 I already have an account</button>`); $("#haveAccount").addEventListener("click", () => { delete $("#sheetBg").dataset.locked; closeSheet(); openLogin(); }); }
@@ -1397,6 +1398,55 @@ function maybeOfferTour(){
   }, 1200);
 }
 $("#replayTour").addEventListener("click", startTour);
+
+/* ---------------- LIVE POSTINGS ----------------
+   Real federal openings from USAJOBS near you, fetched through the Supabase "live-jobs" function
+   (the USAJOBS key stays on the server). Cached for 6 hours. */
+S.liveInfo = { state: "off" };
+const ALL_SKILL_WORDS = () => (QUICK.SKILLS || []).flatMap(g => g[1]).filter(s => s.length >= 4);
+function liveJob(x){
+  const text = (x.title + " " + x.summary).toLowerCase();
+  const st = (String(x.location).match(/,\s*([A-Z]{2})\b/) || [])[1] || S.profile.state || "";
+  const sched = String(x.schedule).toLowerCase();
+  return { id: "live-usaj-" + x.id, library: true, live: true, source: "USAJOBS", title: x.title, company: x.company + (x.dept && !x.company.includes(x.dept) ? ` (${x.dept})` : ""),
+    category: classify(x.title + " " + x.summary), type: /part/.test(sched) ? "part-time" : /intermittent|seasonal|temporary/.test(sched) ? "temporary" : "full-time",
+    payMin: x.payMin, payMax: x.payMax, payUnit: x.payUnit || "year", minAge: 16, teen: false, minYears: 0, education: null, certs: [],
+    skills: ALL_SKILL_WORDS().filter(s => text.includes(s.toLowerCase())).slice(0, 6), benefits: ["Health insurance", "Dental", "Vision", "401(k) / retirement", "Paid time off"],
+    summary: x.summary, remote: !!x.remote, states: st ? [st] : undefined, location: x.location, lat: x.lat, lon: x.lon,
+    applyUrl: x.applyUrl, postedAt: Date.parse(x.posted) || 0, closesAt: Date.parse(x.closes) || 0 };
+}
+async function loadLive(force){
+  if (!cloudOn()) return;
+  const p = S.profile, loc = p.city && p.state ? `${p.city}, ${p.state}` : "";
+  if (!loc) return;
+  const ck = "jh_live", cached = LS.get(ck);
+  if (!force && cached && cached.loc === loc && Date.now() - cached.at < 6 * 3600e3) { useLive(cached); return; }
+  S.liveInfo = { state: "loading" };
+  try {
+    const r = await fetch(`${CLOUD.url}/functions/v1/live-jobs?loc=${encodeURIComponent(loc)}&radius=50`, { headers: { apikey: CLOUD.key } });
+    const data = await r.json();
+    if (!r.ok) { S.liveInfo = { state: data && data.error === "not_configured" ? "off" : "error" }; return; }
+    const c = { loc, at: Date.now(), jobs: data.jobs || [] }; LS.set(ck, c); useLive(c);
+  } catch(e){ S.liveInfo = { state: "error" }; }
+}
+function useLive(c){
+  S.libSets.LIVE = (c.jobs || []).map(liveJob);
+  S.liveInfo = { state: "on", n: S.libSets.LIVE.length, at: c.at, loc: c.loc };
+  rebuildLib();
+}
+function liveChip(j){
+  if (!j.live) return "";
+  const days = j.postedAt ? Math.floor((Date.now() - j.postedAt) / 86400e3) : null;
+  const closes = j.closesAt ? new Date(j.closesAt).toLocaleDateString([], { month: "short", day: "numeric" }) : "";
+  return `<span class="chip" style="background:rgba(255,77,109,.16);color:#ff6b81">🔴 Live posting${days != null ? ` · posted ${days <= 0 ? "today" : days === 1 ? "yesterday" : days + " days ago"}` : ""}${closes ? ` · closes ${esc(closes)}` : ""}</span>`;
+}
+const isHiring = j => !!(j.live || spotOf(j));
+/* Sort by hiring: live postings (newest first), then "hiring now" tags (most recent first), then everything else by match. */
+function hiringRank(r){
+  if (r.j.live) return 3e13 + (r.j.postedAt || 0);
+  const s = spotOf(r.j); if (s) return 2e13 + s.last;
+  return r.m.score;
+}
 
 /* ---------------- RECOVERY CODES ---------------- */
 function newRecoveryCode(){
@@ -1969,13 +2019,14 @@ function renderJobs(){
   const A = allJobs(), VOL0 = !!F.vol;
   const catCounts = {}; let teenN = 0;
   for (const j of A) { if (j.status || !!j.volunteer !== VOL0) continue; if (CAT[j.category]) catCounts[j.category] = (catCounts[j.category]||0) + 1; if (teenOk(j)) teenN++; }
-  const nSaved = (S.profile.saved || []).length, age = myAge(), nHiring = Object.keys(S.spots || {}).length ? A.filter(j => !j.status && spotOf(j)).length : 0;
+  const nSaved = (S.profile.saved || []).length, age = myAge(), nHiring = A.filter(j => !j.status && !!j.volunteer === VOL0 && (j.live || (Object.keys(S.spots || {}).length && spotOf(j)))).length;
   $("#catRow").innerHTML = (age != null ? `<button data-agefit="1" class="${F.ageFit ? "on" : ""}" style="${F.ageFit ? "background:var(--grape);border-color:var(--grape);color:#0d0520" : ""}">🎂 Old enough at ${age}</button>` : "") + (nHiring ? `<button data-hiring="1" class="${F.hiring ? "on" : ""}" style="${F.hiring ? "background:var(--mint);border-color:var(--mint);color:#00140c" : ""}">🟢 Hiring now <span style="opacity:.6">${nHiring}</span></button>` : "") + (nSaved ? `<button data-saved="1" class="${F.saved ? "on" : ""}" style="${F.saved ? "background:var(--coral);border-color:var(--coral);color:#1a0006" : ""}">❤️ Saved <span style="opacity:.6">${nSaved}</span></button>` : "") + `<button data-teen="1" class="${F.teen ? "on" : ""}" style="${F.teen ? "background:var(--mint);border-color:var(--mint);color:#00140c" : ""}">🎒 Teens${teenN ? ` <span style="opacity:.6">${teenN}</span>` : ""}</button><button data-small="1" class="${F.small ? "on" : ""}" style="${F.small ? "background:var(--sun);border-color:var(--sun);color:#1f1400" : ""}">🏪 Small biz <span style="opacity:.6">${allJobs().filter(j => j.smallBiz && !j.status).length}</span></button><button data-cat="all" class="${F.cat === "all" ? "on" : ""}">🌈 All kinds</button>` + CATS.map(([id,i,n]) => `<button data-cat="${id}" class="${F.cat === id ? "on" : ""}">${i} ${n}${catCounts[id] ? ` <span style="opacity:.6">${catCounts[id]}</span>` : ""}</button>`).join("");
   const unsorted = S.jobs.filter(j => !CAT[j.category]).length;
   $("#catHint").innerHTML = (F.teen ? `<div class="banner" style="background:var(--mint-soft);border-color:rgba(52,211,153,.3)">🎒 <b>Jobs for teens:</b> little or no experience needed, best-rated first. Always check the minimum age and your state's rules for working hours.</div>` : "") + (unsorted ? `<div class="banner info row" style="justify-content:space-between">${unsorted} job${unsorted>1?"s":""} not sorted by kind yet<button class="btn small grape" id="sortCats">✨ Sort them</button></div>` : "");
   const fc = filterCount(); $("#filterCount").textContent = fc; $("#filterCount").classList.toggle("hide", !fc);
   const q = norm(F.q), payMinHr = +F.pay ? toHour(+F.pay, F.payUnit) : 0;
   { const st = myState(); if (st && !S.libSets[st] && !S.libLoading[st]) loadLibSet(st); if (F.allStates && !S.allLoading) { S.allLoading = true; loadAllStates(); } }
+  { const lc = S.profile.city && S.profile.state ? `${S.profile.city}, ${S.profile.state}` : ""; if (lc && sb && !(S.liveTried || (S.liveTried = {}))[lc]) { S.liveTried[lc] = 1; loadLive(); } }
   const VOL = !!F.vol;
   /* Fast path for big libraries: cheap checks first, and match scores / distances are cached per job
      until the profile or home location changes. */
@@ -1995,7 +2046,7 @@ function renderJobs(){
     if (F.teen && !teenOk(j)) return false;
     if (F.ageFit && !ageOk(j)) return false;
     if (F.saved && !isSaved(j)) return false;
-    if (F.hiring && !spotOf(j)) return false;
+    if (F.hiring && !isHiring(j)) return false;
     if (F.small && !j.smallBiz) return false;
     if (F.fit && !fitsSchedule(j)) return false;
     if (q && !norm([j.title, j.company, j.location, (j.skills||[]).join(" ")].join(" ")).includes(q)) return false;
@@ -2016,7 +2067,8 @@ function renderJobs(){
     if (F.sort === "dist") { const key = x => x.d != null ? x.d : x.j.remote ? 9e8 : x.j.library ? 5e8 : 1e9; return key(a) - key(b); }
     if (F.sort === "pay") return (payTop(b.j) || 0) - (payTop(a.j) || 0);
     if (F.sort === "rating") return ((b.r && b.r.avg) || 0) - ((a.r && a.r.avg) || 0) || b.m.score - a.m.score;
-    if (F.sort === "new") return (b.j.addedAt || 0) - (a.j.addedAt || 0);
+    if (F.sort === "new") return (b.j.addedAt || b.j.postedAt || 0) - (a.j.addedAt || a.j.postedAt || 0);
+    if (F.sort === "hiring") return hiringRank(b) - hiringRank(a);
     if (F.sort === "age") return ((needAge(a.j) ?? 14) - (needAge(b.j) ?? 14)) || b.m.score - a.m.score;
     return (spotOf(b.j) ? 15 : 0) + b.m.score - (spotOf(a.j) ? 15 : 0) - a.m.score;
   });
@@ -2047,7 +2099,7 @@ function renderJobs(){
       <div class="facts"><span>${where}</span>${p ? `<span>💵 ${esc(p)}${(j.starter || j.library) && !j.volunteer ? " <span class=\"hint\">typical</span>" : ""}</span>` : ""}<span>🕒 ${esc(TYPE_NAME[j.type] || "")}</span></div>
       <div class="facts" style="margin-top:0">${d != null ? `<a href="${esc(dirLink(j,"driving"))}" target="_blank" rel="noopener">🚗 ~${driveMins(d)} min</a><a href="${esc(dirLink(j,"transit"))}" target="_blank" rel="noopener">🚌 Transit</a>` : ""}${j.applyUrl ? `<a href="${esc(j.applyUrl)}" target="_blank" rel="noopener">🌐 Hiring page</a>` : (j.starter || j.library) ? `<a href="${esc(indeedLink(j))}" target="_blank" rel="noopener">🔎 Find openings</a>` : ""}${yearGross(j) ? `<button class="linkish" data-pay="${esc(j.id)}">💸 ≈${$$$(takeHome(yearGross(j)).net/52)}/wk take-home</button>` : ""}${goalChip(j)}${j.applyEmail ? `<span>📧 ${esc(j.applyEmail)}</span>` : ""}${j.phone ? `<a href="tel:${esc(j.phone.replace(/[^\d+]/g, ""))}">📞 ${esc(j.phone)}</a>` : ""}</div>
       ${(j.scam || []).length ? `<button class="btn small block" data-scam="${esc(j.id)}" style="background:var(--coral-soft);color:var(--coral);margin:4px 0 6px">🚩 Possible scam: tap to see why</button>` : ""}
-      <div>${spotChip(j)}${j.volunteer ? `<span class="chip" style="background:var(--grape-soft);color:var(--grape)">🤝 ${j.type === "volunteer" ? "Volunteer" : "Service + stipend"}</span>` : ""}${j.starter ? `<span class="chip" style="background:var(--mint-soft);color:var(--mint)">🌱 Starter lead</span>` : ""}${j.named ? `<span class="chip" style="background:var(--sun-soft);color:var(--sun)">🏪 Local small business</span>` : j.smallBiz ? `<span class="chip" style="background:var(--sun-soft);color:var(--sun)">🏪 Small business</span>` : j.library ? `<span class="chip" style="background:var(--sky-soft);color:var(--sky)">📚 Job library</span>` : ""}${teenOk(j) ? `<span class="chip" style="background:var(--mint-soft);color:var(--mint)">🎒 ${j.minAge ? esc(j.minAge) + "+" : "Teen-friendly"}</span>` : ""}${CAT[j.category] ? `<span class="chip cat">${CAT[j.category].i} ${CAT[j.category].n}</span>` : ""}${chips}</div>${perks ? `<div style="margin-top:4px">${perks}</div>` : ""}
+      <div>${liveChip(j)}${spotChip(j)}${j.volunteer ? `<span class="chip" style="background:var(--grape-soft);color:var(--grape)">🤝 ${j.type === "volunteer" ? "Volunteer" : "Service + stipend"}</span>` : ""}${j.starter ? `<span class="chip" style="background:var(--mint-soft);color:var(--mint)">🌱 Starter lead</span>` : ""}${j.named ? `<span class="chip" style="background:var(--sun-soft);color:var(--sun)">🏪 Local small business</span>` : j.smallBiz ? `<span class="chip" style="background:var(--sun-soft);color:var(--sun)">🏪 Small business</span>` : j.library ? `<span class="chip" style="background:var(--sky-soft);color:var(--sky)">📚 Job library</span>` : ""}${teenOk(j) ? `<span class="chip" style="background:var(--mint-soft);color:var(--mint)">🎒 ${j.minAge ? esc(j.minAge) + "+" : "Teen-friendly"}</span>` : ""}${CAT[j.category] ? `<span class="chip cat">${CAT[j.category].i} ${CAT[j.category].n}</span>` : ""}${chips}</div>${perks ? `<div style="margin-top:4px">${perks}</div>` : ""}
       ${j.summary ? `<div class="hint" style="margin-top:8px">${esc(j.summary)}</div>` : ""}
       <div class="hint" style="margin-top:6px;display:flex;gap:16px;flex-wrap:wrap"><button class="linkish" data-share="${esc(j.id)}">📤 Share this job</button>${sb && !j.remote ? `<button class="linkish" data-spot="${esc(j.id)}">${(spotOf(j) || {}).mine ? "✓ You said they're hiring" : "🟢 I saw they're hiring"}</button>` : ""}</div>
       <div class="jbtns">
@@ -2700,7 +2752,7 @@ async function setHomeZip(zip){
   S.profile = {...S.profile, zip, state: stateFromZip(zip) || S.profile.state, lat: null, lon: null, geoFor: ""}; await saveProfile();
   loadLibrary(); renderAll(true);
   const q = {...S.profile}; await locate(q);
-  if (q.geoFor && S.profile.zip === zip) { S.profile = {...S.profile, lat: q.lat, lon: q.lon, geoFor: q.geoFor, city: S.profile.city || q.city, state: q.state || S.profile.state}; await saveProfile(); renderAll(true); }
+  if (q.geoFor && S.profile.zip === zip) { S.profile = {...S.profile, lat: q.lat, lon: q.lon, geoFor: q.geoFor, city: S.profile.city || q.city, state: q.state || S.profile.state}; await saveProfile(); renderAll(true); try { loadLive(true); } catch(e){} }
 }
 function askZip(){
   if ($("#signupZip") || $("#sheetBg").classList.contains("on")) return;
