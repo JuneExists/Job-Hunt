@@ -544,6 +544,11 @@ nav button.on{background:var(--cyan-soft);border:2.5px solid var(--cyan);box-sha
     <label class="row" style="margin-top:12px;font-weight:800"><input type="checkbox" id="fRemote"> 🏠 Include remote jobs</label>
   </div>
   <div class="box">
+    <label class="row" style="font-weight:800"><input type="checkbox" id="fAgeOn"> 🎂 Age filter: hide jobs I'm too young for</label>
+    <div class="row" style="margin-top:10px;gap:10px;align-items:center"><span class="hint">My age</span><input id="fAge" type="number" inputmode="numeric" min="12" max="99" placeholder="Age" style="max-width:110px"></div>
+    <div class="hint" style="margin-top:6px">Jobs that don't list an age count as 18+ unless they're clearly teen-friendly.</div>
+  </div>
+  <div class="box">
     <label>💵 Pay at least</label>
     <div class="trio" style="grid-template-columns:1fr 1fr"><input id="fPay" type="number" inputmode="decimal" placeholder="Any"><div class="seg" id="fPayUnit"><button data-u="hour">/hr</button><button data-u="year">/yr</button></div></div>
     <label class="row" style="margin-top:12px;font-weight:800"><input type="checkbox" id="fPayListed"> Hide jobs that don't list pay</label>
@@ -1938,6 +1943,15 @@ function teenOk(j){
 /* age: jobs with no listed age count as 18+ unless they're clearly teen-friendly */
 const myAge = () => { const a = parseInt(S.profile.age, 10); return a >= 10 && a < 100 ? a : null; };
 function needAge(j){ if (j.minAge != null && j.minAge !== "") return +j.minAge; return teenOk(j) ? null : 18; }
+function askAge(){
+  openSheet(`<div class="sheet-head"><h2>🎂 Age filter</h2><button class="x" data-close aria-label="Close">×</button></div>
+  <div class="box"><label>How old are you?</label><div class="hint" style="margin-bottom:8px">We'll hide jobs with a higher minimum age. You can turn this off anytime.</div>
+  <div class="pick" id="ageQuick">${[14,15,16,17,18,19,20,21].map(a => `<button type="button" class="btn small ghost" data-a="${a}">${a}${a === 21 ? "+" : ""}</button>`).join("")}</div>
+  <div class="row" style="margin-top:10px;gap:10px"><input id="ageAny" type="number" inputmode="numeric" min="12" max="99" placeholder="Or type it"><button type="button" class="btn primary" id="ageGo">Turn on</button></div></div>`);
+  const go = a => { a = parseInt(a, 10); if (!(a >= 12 && a < 100)) { toast("Type an age from 12 to 99"); return; } S.profile.age = String(a); saveProfile(); S.F.ageFit = true; saveFilters(); closeSheet(); renderAll(true); toast(`🎂 Age filter on: showing jobs you can do at ${a}`); };
+  $("#ageQuick").addEventListener("click", e => { const b = e.target.closest("[data-a]"); if (b) go(b.dataset.a); });
+  $("#ageGo").addEventListener("click", () => go($("#ageAny").value));
+}
 function ageOk(j){ const a = myAge(); if (a == null) return true; const n = needAge(j); return n == null ? a >= 14 : a >= n; }
 const isSaved = j => (S.profile.saved || []).includes(j.id);
 async function toggleSaved(j, on){
@@ -2000,7 +2014,7 @@ document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#sheet
 /* ---------------- FILTERS ---------------- */
 function filterCount(){
   const F = S.F; let n = 0;
-  if (F.cat && F.cat !== "all") n++; if (F.teen) n++; if (F.lib === false) n++; if (F.fit) n++; if (F.allStates) n++; if (F.small) n++; if (F.minMatch) n++; if (F.qual) n++; if (F.dist) n++; if (!F.remote) n++; if (+F.pay) n++; if (F.payListed) n++;
+  if (F.cat && F.cat !== "all") n++; if (F.ageFit && myAge() != null) n++; if (F.teen) n++; if (F.lib === false) n++; if (F.fit) n++; if (F.allStates) n++; if (F.small) n++; if (F.minMatch) n++; if (F.qual) n++; if (F.dist) n++; if (!F.remote) n++; if (+F.pay) n++; if (F.payListed) n++;
   n += F.benefits.length; if (F.types.length !== TYPES.length) n++;
   return n;
 }
@@ -2013,12 +2027,17 @@ function openFilters(){
   $("#fTypes").innerHTML = TYPES.map(t => `<label><input type="checkbox" value="${t}" ${F.types.includes(t) ? "checked" : ""}>${TYPE_NAME[t]}</label>`).join("");
   $("#fMatch").value = F.minMatch; $("#fMatchV").textContent = F.minMatch + "%";
   $("#fQual").checked = F.qual; $("#fRemote").checked = F.remote; $("#fPay").value = F.pay; $("#fPayListed").checked = F.payListed; $("#fHideApplied").checked = F.hideApplied; $("#fLib").checked = F.lib !== false; $("#fFit").checked = !!F.fit; $("#fAll").checked = !!F.allStates;
+  $("#fAgeOn").checked = !!F.ageFit && myAge() != null; $("#fAge").value = myAge() ?? "";
   $$("#fPayUnit button").forEach(b => b.classList.toggle("on", b.dataset.u === F.payUnit));
   const home = S.profile;
   $("#distHint").innerHTML = home.lat != null ? `Measured from ${esc([home.city, home.state].filter(Boolean).join(", ") || "your spot")}` : `<a href="#" data-go="profile">Add your ZIP code</a> to use distance.`;
   const read = () => {
     F.minMatch = +$("#fMatch").value; $("#fMatchV").textContent = F.minMatch + "%";
     F.qual = $("#fQual").checked; F.remote = $("#fRemote").checked; F.pay = $("#fPay").value; F.payListed = $("#fPayListed").checked; F.hideApplied = $("#fHideApplied").checked; F.lib = $("#fLib").checked; F.fit = $("#fFit").checked; F.allStates = $("#fAll").checked;
+    const ag = parseInt($("#fAge").value, 10), agOk = ag >= 12 && ag < 100;
+    if (agOk && String(ag) !== String(S.profile.age)) { S.profile.age = String(ag); saveProfile(); }
+    F.ageFit = $("#fAgeOn").checked && (agOk || myAge() != null);
+    if ($("#fAgeOn").checked && !agOk && myAge() == null) $("#fAge").focus();
     F.dist = +(($("#fDist input:checked") || {}).value || 0);
     F.benefits = $$("#fBenefits input:checked").map(i => i.value);
     F.types = $$("#fTypes input:checked").map(i => i.value);
@@ -2030,7 +2049,7 @@ function openFilters(){
 }
 $("#openFilters").addEventListener("click", openFilters);
 $("#fSearch").addEventListener("input", e => { S.F.q = e.target.value; renderJobs(); });
-$("#catRow").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; if (b.dataset.teen) { S.F.teen = !S.F.teen; saveFilters(); renderJobs(); return; } if (b.dataset.agefit) { S.F.ageFit = !S.F.ageFit; saveFilters(); renderJobs(); return; } if (b.dataset.saved) { S.F.saved = !S.F.saved; saveFilters(); renderJobs(); return; } if (b.dataset.hiring) { S.F.hiring = !S.F.hiring; saveFilters(); renderJobs(); return; } if (b.dataset.small) { S.F.small = !S.F.small; saveFilters(); renderJobs(); return; } S.F.cat = b.dataset.cat; saveFilters(); renderJobs(); });
+$("#catRow").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; if (b.dataset.teen) { S.F.teen = !S.F.teen; saveFilters(); renderJobs(); return; } if (b.dataset.agefit) { if (myAge() == null) { askAge(); return; } S.F.ageFit = !S.F.ageFit; saveFilters(); renderJobs(); toast(S.F.ageFit ? `🎂 Age filter on: showing jobs you can do at ${myAge()}` : "🎂 Age filter off: showing all ages"); return; } if (b.dataset.saved) { S.F.saved = !S.F.saved; saveFilters(); renderJobs(); return; } if (b.dataset.hiring) { S.F.hiring = !S.F.hiring; saveFilters(); renderJobs(); return; } if (b.dataset.small) { S.F.small = !S.F.small; saveFilters(); renderJobs(); return; } S.F.cat = b.dataset.cat; saveFilters(); renderJobs(); });
 $("#catHint").addEventListener("click", e => { if (e.target.closest("#sortCats")) sortIntoCats(); });
 async function sortIntoCats(){
   const todo = S.jobs.filter(j => !CAT[j.category]); if (!todo.length) return;
@@ -2053,7 +2072,7 @@ function renderJobs(){
   const catCounts = {}; let teenN = 0;
   for (const j of A) { if (j.status || !!j.volunteer !== VOL0) continue; if (CAT[j.category]) catCounts[j.category] = (catCounts[j.category]||0) + 1; if (teenOk(j)) teenN++; }
   const nSaved = (S.profile.saved || []).length, age = myAge(), nHiring = A.filter(j => !j.status && !!j.volunteer === VOL0 && (j.live || (Object.keys(S.spots || {}).length && spotOf(j)))).length;
-  $("#catRow").innerHTML = (age != null ? `<button data-agefit="1" class="${F.ageFit ? "on" : ""}" style="${F.ageFit ? "background:var(--grape);border-color:var(--grape);color:#0d0520" : ""}">🎂 Old enough at ${age}</button>` : "") + (nHiring ? `<button data-hiring="1" class="${F.hiring ? "on" : ""}" style="${F.hiring ? "background:var(--mint);border-color:var(--mint);color:#00140c" : ""}">🟢 Hiring now <span style="opacity:.6">${nHiring}</span></button>` : "") + (nSaved ? `<button data-saved="1" class="${F.saved ? "on" : ""}" style="${F.saved ? "background:var(--coral);border-color:var(--coral);color:#1a0006" : ""}">❤️ Saved <span style="opacity:.6">${nSaved}</span></button>` : "") + `<button data-teen="1" class="${F.teen ? "on" : ""}" style="${F.teen ? "background:var(--mint);border-color:var(--mint);color:#00140c" : ""}">🎒 Teens${teenN ? ` <span style="opacity:.6">${teenN}</span>` : ""}</button><button data-small="1" class="${F.small ? "on" : ""}" style="${F.small ? "background:var(--sun);border-color:var(--sun);color:#1f1400" : ""}">🏪 Small biz <span style="opacity:.6">${allJobs().filter(j => j.smallBiz && !j.status).length}</span></button><button data-cat="all" class="${F.cat === "all" ? "on" : ""}">🌈 All kinds</button>` + CATS.map(([id,i,n]) => `<button data-cat="${id}" class="${F.cat === id ? "on" : ""}">${i} ${n}${catCounts[id] ? ` <span style="opacity:.6">${catCounts[id]}</span>` : ""}</button>`).join("");
+  $("#catRow").innerHTML = `<button data-agefit="1" class="${F.ageFit && age != null ? "on" : ""}" style="${F.ageFit && age != null ? "background:var(--grape);border-color:var(--grape);color:#0d0520" : ""}">🎂 ${age != null ? `Age ${age}: ${F.ageFit ? "on" : "off"}` : "Age filter: off"}</button>` + (nHiring ? `<button data-hiring="1" class="${F.hiring ? "on" : ""}" style="${F.hiring ? "background:var(--mint);border-color:var(--mint);color:#00140c" : ""}">🟢 Hiring now <span style="opacity:.6">${nHiring}</span></button>` : "") + (nSaved ? `<button data-saved="1" class="${F.saved ? "on" : ""}" style="${F.saved ? "background:var(--coral);border-color:var(--coral);color:#1a0006" : ""}">❤️ Saved <span style="opacity:.6">${nSaved}</span></button>` : "") + `<button data-teen="1" class="${F.teen ? "on" : ""}" style="${F.teen ? "background:var(--mint);border-color:var(--mint);color:#00140c" : ""}">🎒 Teens${teenN ? ` <span style="opacity:.6">${teenN}</span>` : ""}</button><button data-small="1" class="${F.small ? "on" : ""}" style="${F.small ? "background:var(--sun);border-color:var(--sun);color:#1f1400" : ""}">🏪 Small biz <span style="opacity:.6">${allJobs().filter(j => j.smallBiz && !j.status).length}</span></button><button data-cat="all" class="${F.cat === "all" ? "on" : ""}">🌈 All kinds</button>` + CATS.map(([id,i,n]) => `<button data-cat="${id}" class="${F.cat === id ? "on" : ""}">${i} ${n}${catCounts[id] ? ` <span style="opacity:.6">${catCounts[id]}</span>` : ""}</button>`).join("");
   const unsorted = S.jobs.filter(j => !CAT[j.category]).length;
   $("#catHint").innerHTML = (F.teen ? `<div class="banner" style="background:var(--mint-soft);border-color:rgba(52,211,153,.3)">🎒 <b>Jobs for teens:</b> little or no experience needed, best-rated first. Always check the minimum age and your state's rules for working hours.</div>` : "") + (unsorted ? `<div class="banner info row" style="justify-content:space-between">${unsorted} job${unsorted>1?"s":""} not sorted by kind yet<button class="btn small grape" id="sortCats">✨ Sort them</button></div>` : "");
   const fc = filterCount(); $("#filterCount").textContent = fc; $("#filterCount").classList.toggle("hide", !fc);
