@@ -178,7 +178,7 @@ input[type=file]{padding:10px}
 
 pre{background:#05060a;border:1px solid var(--line);color:#c9d6ff;padding:14px;border-radius:14px;max-height:240px;overflow:auto;font-size:12px}
 .toast{position:fixed;bottom:calc(92px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(10px);background:var(--ink);color:#000;padding:12px 18px;border-radius:16px;font-weight:800;font-size:15px;opacity:0;transition:.2s;pointer-events:none;z-index:80;width:max-content;max-width:90vw;text-align:center}
-.toast.on{opacity:1;transform:translateX(-50%)}
+.toast.on{opacity:1;transform:translateX(-50%);pointer-events:auto}
 .spin{display:inline-block;width:16px;height:16px;border:3px solid currentColor;border-right-color:transparent;border-radius:50%;animation:s .7s linear infinite;vertical-align:-3px}
 @keyframes s{to{transform:rotate(360deg)}}
 .hide{display:none!important}
@@ -279,6 +279,11 @@ nav button.on{background:var(--cyan-soft);border:2.5px solid var(--cyan);box-sha
 #tourSpot{position:fixed;border-radius:16px;border:3px solid var(--cyan);box-shadow:0 0 0 9999px rgba(2,4,10,.78);transition:all .25s ease;pointer-events:none}
 #tourCard{position:fixed;left:14px;right:14px;max-width:520px;margin:0 auto;background:var(--card);border:2.5px solid var(--cyan);border-radius:20px;padding:16px 18px;box-shadow:6px 6px 0 #000;transition:top .25s ease}
 @media (prefers-reduced-motion: reduce){#tourSpot,#tourCard{transition:none}}
+
+/* tap-to-add missing skills */
+.chip.addable{font:inherit;cursor:pointer;border:2px dashed currentColor;background:var(--coral-soft);display:inline-flex;align-items:center;gap:4px}
+.chip.addable .plus{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--coral);color:#1a0006;font-size:14px;line-height:1}
+.chip.addable:active{transform:scale(.95)}
 </style>
 </head>
 <body>
@@ -302,10 +307,10 @@ nav button.on{background:var(--cyan-soft);border:2.5px solid var(--cyan);box-sha
     <div id="catHint"></div>
     <div class="sortrow" id="sortRow">
       <button data-sort="match" class="on">✨ Best match</button>
+      <button data-sort="hiring">🟢 Hiring now</button>
       <button data-sort="dist">📍 Closest</button>
       <button data-sort="pay">💵 Top pay</button>
       <button data-sort="rating">⭐ Top rated</button>
-      <button data-sort="hiring">🟢 Hiring</button>
       <button data-sort="new">🆕 Newest</button>
       <button data-sort="age">🎂 Youngest age</button>
     </div>
@@ -1441,6 +1446,32 @@ function liveChip(j){
   return `<span class="chip" style="background:rgba(255,77,109,.16);color:#ff6b81">🔴 Live posting${days != null ? ` · posted ${days <= 0 ? "today" : days === 1 ? "yesterday" : days + " days ago"}` : ""}${closes ? ` · closes ${esc(closes)}` : ""}</span>`;
 }
 const isHiring = j => !!(j.live || spotOf(j));
+/* Tap a missing skill or certification on any job to add it to your profile (tap again on the toast to undo). */
+function addChip(kind, v){
+  return `<button type="button" class="chip miss addable" data-add${kind}="${esc(v)}" title="Tap if you have this" aria-label="Add ${esc(v)} to my ${kind === "cert" ? "certifications" : "skills"}">✗ ${esc(v)} <b class="plus">＋</b></button>`;
+}
+function addToProfile(kind, v){
+  const key = kind === "cert" ? "certs" : "skills", list = S.profile[key] || [];
+  if (list.some(x => norm(x) === norm(v))) return;
+  S.profile = {...S.profile, [key]: [...list, v]}; saveProfile(); pfDirty = false; renderAll(true);
+  if (typeof deck !== "undefined" && !$("#swipeView").classList.contains("hide")) drawDeck();
+  toastUndo(`Added “${v}” to your ${kind === "cert" ? "certifications" : "skills"} ✓`, () => {
+    S.profile = {...S.profile, [key]: (S.profile[key] || []).filter(x => norm(x) !== norm(v))}; saveProfile(); renderAll(true);
+    if (!$("#swipeView").classList.contains("hide")) drawDeck();
+  });
+}
+function toastUndo(msg, undo){
+  const el = $("#toast"); if (!el) return toast(msg);
+  el.innerHTML = `${esc(msg)} <button type="button" id="toastUndo" style="margin-left:10px;background:none;border:0;color:#0a55c8;font:900 15px Nunito,sans-serif;text-decoration:underline">Undo</button>`;
+  el.classList.add("on"); clearTimeout(toastUndo.t); toastUndo.t = setTimeout(() => el.classList.remove("on"), 4500);
+  $("#toastUndo").onclick = () => { undo(); el.classList.remove("on"); };
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-addskill],[data-addcert]"); if (!b) return;
+  e.preventDefault(); e.stopPropagation();
+  if (b.dataset.addcert != null) { if (!confirm(`Do you have “${b.dataset.addcert}”? It'll be added to your certifications.`)) return; addToProfile("cert", b.dataset.addcert); }
+  else addToProfile("skill", b.dataset.addskill);
+}, true);
 /* Sort by hiring: live postings (newest first), then "hiring now" tags (most recent first), then everything else by match. */
 function hiringRank(r){
   if (r.j.live) return 3e13 + (r.j.postedAt || 0);
@@ -2088,9 +2119,9 @@ function renderJobs(){
     const myst = myState();
     const where = j.remote ? "🏠 Remote" : (j.library && !j.location) ? j.smallBiz ? "📍 Near you" : (j.states ? (myst && j.states.includes(myst) ? `📍 In ${esc(STATE_NAME[myst] || myst)}` : `📍 ${esc(j.states.slice(0, 4).join(", "))}${j.states.length > 4 ? " +" + (j.states.length - 4) : ""}`) : "📍 In most areas") : `📍 ${esc(j.location || "Location not listed")}${d != null ? ` · <b>${d < 0.1 ? "under 0.1" : d < 10 ? d.toFixed(1) : Math.round(d)} mi</b>` : ""}`;
     const p = payText(j);
-    const chips = m.got.slice(0,5).map(s => `<span class="chip ok">✓ ${esc(s)}</span>`).join("") + m.miss.slice(0,4).map(s => `<span class="chip miss">✗ ${esc(s)}</span>`).join("")
+    const chips = m.got.slice(0,5).map(s => `<span class="chip ok">✓ ${esc(s)}</span>`).join("") + m.miss.slice(0,6).map(s => addChip("skill", s)).join("")
       + (!m.yearsOk ? `<span class="chip miss">✗ ${esc(j.minYears)}+ yrs</span>` : "") + (!m.eduOk ? `<span class="chip miss">✗ ${esc(EDU_NAME[j.education])}</span>` : "")
-      + m.certMiss.slice(0,2).map(c => `<span class="chip miss">✗ ${esc(c)}</span>`).join("");
+      + m.certMiss.slice(0,3).map(c => addChip("cert", c)).join("");
     const bens = j.benefits || [];
     const perks = bens.slice(0, 3).map(b => `<span class="chip perk">${BEN_ICON[b] || "🎁"} ${esc(b)}</span>`).join("") + (bens.length > 3 ? `<span class="chip perk" title="${esc(bens.slice(3).join(", "))}">+${bens.length - 3} more</span>` : "");
     return `<div class="card job" style="--stripe:${stripe}">
@@ -3089,7 +3120,7 @@ function swipeCard(r, under){
   return `<div class="scard${under ? " under" : ""}" style="border-top:6px solid ${stripe}"><div class="stamp yes">SAVE</div><div class="stamp no">SKIP</div>
     <div class="jtop"><div style="flex:1;min-width:0"><h2 style="margin:0">${esc(j.title)}</h2><div class="comp" style="font-size:18px">${esc(j.company)}</div></div><div class="pct" style="--pbg:${bg};--pfg:${fg}">${r.m.score}%<small>${label}</small></div></div>
     <div class="facts" style="font-size:17px"><span>${where}${r.d != null ? ` · <b>${r.d < 0.1 ? "under 0.1" : r.d < 10 ? r.d.toFixed(1) : Math.round(r.d)} mi</b>` : ""}</span>${p ? `<span>💵 ${esc(p)}</span>` : ""}<span>🕒 ${esc(TYPE_NAME[j.type] || "")}</span>${n ? `<span>🎂 ${n}+</span>` : ""}${yearGross(j) ? `<span>💸 ≈${$$$(takeHome(yearGross(j)).net/52)}/wk</span>` : ""}${goalChip(j)}</div>
-    <div style="margin:8px 0">${j.named ? `<span class="chip" style="background:var(--sun-soft);color:var(--sun)">🏪 Local small business</span>` : ""}${r.m.got.slice(0,4).map(s => `<span class="chip ok">✓ ${esc(s)}</span>`).join("")}${r.m.miss.slice(0,3).map(s => `<span class="chip miss">✗ ${esc(s)}</span>`).join("")}${(j.benefits||[]).slice(0,3).map(b => `<span class="chip perk">${BEN_ICON[b] || "🎁"} ${esc(b)}</span>`).join("")}</div>
+    <div style="margin:8px 0">${j.named ? `<span class="chip" style="background:var(--sun-soft);color:var(--sun)">🏪 Local small business</span>` : ""}${r.m.got.slice(0,4).map(s => `<span class="chip ok">✓ ${esc(s)}</span>`).join("")}${r.m.miss.slice(0,4).map(s => addChip("skill", s)).join("")}${(j.benefits||[]).slice(0,3).map(b => `<span class="chip perk">${BEN_ICON[b] || "🎁"} ${esc(b)}</span>`).join("")}</div>
     ${j.summary ? `<p style="font-size:16px;line-height:1.5;color:var(--muted)">${esc(j.summary)}</p>` : ""}</div>`;
 }
 function drawDeck(){
