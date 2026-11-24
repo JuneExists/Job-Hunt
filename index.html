@@ -1417,7 +1417,9 @@ function liveJob(x){
     category: classify(x.title + " " + x.summary), type: /part/.test(sched) ? "part-time" : /intermittent|seasonal|temporary/.test(sched) ? "temporary" : "full-time",
     payMin: x.payMin, payMax: x.payMax, payUnit: x.payUnit || "year", minAge: 16, teen: false, minYears: 0, education: null, certs: [],
     skills: ALL_SKILL_WORDS().filter(s => text.includes(s.toLowerCase())).slice(0, 6), benefits: ["Health insurance", "Dental", "Vision", "401(k) / retirement", "Paid time off"],
-    summary: x.summary, remote: !!x.remote, states: st ? [st] : undefined, location: x.location, lat: x.lat, lon: x.lon,
+    summary: x.summary, ...(() => { const rem = !!x.remote || /anywhere|remote|telework/i.test(x.location), spot = x.lat && x.lon && !rem;
+      return { remote: rem, location: rem ? "Remote (anywhere in the U.S.)" : x.location, lat: spot ? x.lat : null, lon: spot ? x.lon : null }; })(),
+    states: st ? [st] : undefined,
     applyUrl: x.applyUrl, postedAt: Date.parse(x.posted) || 0, closesAt: Date.parse(x.closes) || 0 };
 }
 async function loadLive(force){
