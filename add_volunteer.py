@@ -115,6 +115,65 @@ for st, (name, cities, uni) in S.items():
           f"Get trained to speak up in court for a child in foster care around {c}. About 10 to 15 hours a month.", findUrl=gsearch(f"CASA volunteer {c} {st}"), **base))
 
 
+# ---- more every-city programs (national groups with local chapters nearly everywhere) ----
+for st, (name, cities, uni) in S.items():
+    stname = S[st][0]
+    for (c, lat, lon) in cities:
+        k = f"{slug(st)}-{slug(c)}"; base = dict(states=[st], location=f"{c}, {st}", lat=lat, lon=lon)
+        for sfx, title, comp, cat, age, skills, summ in [
+          ("taxaide", "Tax Preparer Volunteer", "AARP Foundation Tax-Aide", "brainy", 18, ["Math", "Attention to detail", "Customer service", "Computers"],
+             f"Get free IRS training, then help neighbors around {c} file their taxes, January to April. You don't need to be an AARP member or retired."),
+          ("restore", "ReStore Volunteer", "Habitat for Humanity ReStore", "hands-on", 14, ["Customer service", "Lifting", "Teamwork", "Cash handling"],
+             f"Sort donated furniture and building supplies, help shoppers and run the register at a ReStore around {c}."),
+          ("unitedway", "Volunteer", "United Way", "people", 14, ["Teamwork", "Event planning", "Communication"],
+             f"Pick from reading buddy programs, school supply drives, tax help and one-day service projects around {c}."),
+          ("scouting", "Leader or Merit Badge Counselor", "Scouting America", "care", 18, ["Leadership", "Teaching", "Outdoor work"],
+             f"Lead a troop or pack, or teach a merit badge in a skill you know, around {c}. Free online training."),
+          ("4h", "4-H Volunteer Leader", f"{stname} 4-H", "care", 18, ["Teaching", "Leadership", "Animals", "Crafts"],
+             f"Lead a club or teach a project (art, cooking, animals, robotics) for kids around {c} through the state's 4-H program."),
+          ("toys", "Toy Drive Volunteer (fall & winter)", "Marine Toys for Tots", "people", 14, ["Teamwork", "Organization", "Lifting"],
+             f"Sort, wrap and hand out donated toys for families around {c} during the holiday season."),
+          ("aws", "Event Volunteer", "Alzheimer's Association", "people", 14, ["Event planning", "Teamwork", "Customer service"],
+             f"Help run the Walk to End Alzheimer's and community events around {c}, or train to lead education talks."),
+        ]:
+            out.append(vol(f"vol-{k}-{sfx}", title, comp, cat, age, skills, summ, findUrl=gsearch(f"{comp} volunteer {c} {st}"), **base))
+
+# ---- more remote / from home ----
+for id_, title, comp, cat, age, skills, summ in [
+  ("vol-upchieve", "Online Tutor", "UPchieve", "brainy", 18, ["Tutoring", "Teaching", "Math", "Writing"], "Tutor low-income high schoolers by chat in math, science, writing or college prep, whenever you have 30 minutes."),
+  ("vol-schoolhouse", "Peer Tutor", "Schoolhouse.world", "brainy", 13, ["Tutoring", "Teaching", "Math", "Public speaking"], "Lead small free Zoom tutoring sessions in subjects you've shown you know. Teens welcome."),
+  ("vol-trevor", "Crisis Counselor", "The Trevor Project", "care", 18, ["Active listening", "Compassion", "Typing"], "Support LGBTQ+ young people by chat or text from home after free training."),
+  ("vol-citizen-archivist", "Citizen Archivist", "U.S. National Archives", "brainy", 13, ["Typing", "Research", "Attention to detail"], "Transcribe and tag historical records from the National Archives, any time, from anywhere."),
+  ("vol-pgdp", "Proofreader", "Distributed Proofreaders (Project Gutenberg)", "brainy", 13, ["Reading", "Attention to detail", "Writing"], "Check one page at a time of old books being turned into free ebooks."),
+  ("vol-bookshare", "Book Proofreader", "Bookshare (Benetech)", "brainy", 13, ["Reading", "Attention to detail", "Computers"], "Proofread scanned books so students with disabilities can read them."),
+  ("vol-dosomething", "Campaign Volunteer", "DoSomething.org", "people", 13, ["Leadership", "Social media", "Event planning"], "Pick from quick cause campaigns you can run at school or online. Built for ages 13 to 25."),
+  ("vol-taproot", "Pro Bono Volunteer", "Taproot Foundation", "brainy", 18, ["Project management", "Marketing", "Graphic design", "Writing"], "Use work skills on short pro bono projects for nonprofits. Good portfolio pieces."),
+  ("vol-moth-light", "Mapathon Volunteer", "Missing Maps", "brainy", 13, ["Computers", "Attention to detail"], "Join online or in-person mapathons to map places that aren't on any map yet."),
+  ("vol-ftc-penpal", "Pen Pal for an Older Adult", "Love For Our Elders", "people", 13, ["Writing", "Friendly", "Compassion"], "Write handwritten letters to older adults in care homes who would love some mail."),
+]:
+    out.append(vol(id_, title, comp, cat, age, skills, summ, remote=True, findUrl=gsearch(f"{comp} volunteer")))
+
+# ---- more Salt Lake City / Utah favorites ----
+for id_, title, comp, cat, age, skills, summ, lat, lon, loc in [
+  ("vol-ut-fourth-street", "Clinic Volunteer", "Fourth Street Clinic", "care", 18, ["Compassion", "Customer service", "Spanish"], "Help at the front desk, pharmacy and patient programs for people experiencing homelessness. Medical students and MAs welcome.", 40.76, -111.90, "Salt Lake City, UT"),
+  ("vol-ut-neighborhood-house", "Volunteer", "Neighborhood House", "care", 16, ["Childcare", "Tutoring", "Compassion"], "Read, play and help with homework in child care and adult day programs on the west side.", 40.74, -111.91, "Salt Lake City, UT"),
+  ("vol-ut-asian-assoc", "Volunteer", "Asian Association of Utah", "people", 16, ["Tutoring", "Bilingual", "Compassion"], "Tutor English, help with youth programs and support refugee and immigrant families.", 40.72, -111.89, "Salt Lake City, UT"),
+  ("vol-ut-wcg", "Garden Volunteer", "Wasatch Community Gardens", "outdoors", 12, ["Gardening", "Outdoor work", "Teamwork"], "Plant, weed and harvest at community gardens and help at youth garden programs.", 40.74, -111.88, "Salt Lake City, UT"),
+  ("vol-ut-treeutah", "Tree Planting Volunteer", "TreeUtah", "outdoors", 10, ["Outdoor work", "Gardening", "Teamwork"], "Plant and care for trees at Saturday events around the valley. Families welcome.", 40.76, -111.89, "Salt Lake City, UT"),
+  ("vol-ut-umfa", "Museum Volunteer", "Utah Museum of Fine Arts", "creative", 16, ["Art", "Public speaking", "Customer service"], "Greet guests, help at art-making events and train as a gallery guide at the U's art museum.", 40.76, -111.84, "Salt Lake City, UT"),
+  ("vol-ut-leonardo", "Museum Volunteer", "The Leonardo", "brainy", 14, ["Science", "Art", "Public speaking"], "Run hands-on science and art activities for visitors downtown.", 40.76, -111.89, "Salt Lake City, UT"),
+  ("vol-ut-clark", "Volunteer", "Clark Planetarium", "brainy", 14, ["Science", "Public speaking", "Customer service"], "Help guests with exhibits and star shows at The Gateway.", 40.77, -111.90, "Salt Lake City, UT"),
+  ("vol-ut-kostopulos", "Camp Volunteer", "Camp Kostopulos", "outdoors", 14, ["Childcare", "Patience", "Outdoor work"], "Help campers with disabilities swim, climb and do crafts at camp up Emigration Canyon.", 40.78, -111.79, "Salt Lake City, UT"),
+  ("vol-ut-nac", "Adaptive Sports Volunteer", "National Ability Center", "outdoors", 16, ["Sports", "Coaching", "Patience"], "Help people with disabilities ski, ride horses, climb and more. Training provided.", 40.68, -111.48, "Park City, UT"),
+  ("vol-ut-bike-collective", "Shop Volunteer", "Bicycle Collective", "hands-on", 14, ["Tools", "Repair", "Teaching"], "Fix up donated bikes and teach people to repair their own. You'll learn as you go.", 40.74, -111.90, "Salt Lake City, UT"),
+  ("vol-ut-pride", "Volunteer", "Utah Pride Center", "people", 16, ["Event planning", "Customer service", "Compassion"], "Help at the community center, youth programs and the Utah Pride Festival.", 40.76, -111.90, "Salt Lake City, UT"),
+  ("vol-ut-ywca", "Volunteer", "YWCA Utah", "care", 18, ["Childcare", "Compassion", "Teamwork"], "Help in children's programs, events and donation drives supporting women and families.", 40.76, -111.88, "Salt Lake City, UT"),
+  ("vol-ut-encircle", "Volunteer", "Encircle", "care", 18, ["Compassion", "Friendly", "Event planning"], "Help at a home for LGBTQ+ youth and families with events, tutoring and hosting.", 40.76, -111.87, "Salt Lake City, UT"),
+  ("vol-ut-sharing-place", "Grief Group Volunteer", "The Sharing Place", "care", 18, ["Compassion", "Active listening", "Childcare"], "Get trained to support kids and teens in grief support groups.", 40.68, -111.84, "Salt Lake City, UT"),
+]:
+    out.append(vol(id_, title, comp, cat, age, skills, summ, lat=lat, lon=lon, states=["UT"], location=loc, findUrl=gsearch(f"{comp} volunteer")))
+
+
 L = [j for j in json.load(open("jobs-library.json")) if not j["id"].startswith("vol")]
 for j in L:   # stipend service programs already in the starter list move into the volunteer section
     if j["company"] in ("AmeriCorps", "City Year"): j["volunteer"] = True
